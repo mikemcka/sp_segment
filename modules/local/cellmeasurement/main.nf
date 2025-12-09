@@ -3,7 +3,7 @@ process CELLMEASUREMENT {
     label 'process_multi'
 
     conda "${moduleDir}/environment.yml"
-    container "ghcr.io/wehi-soda-hub/cellmeasurement:0.2.0"
+    container "ghcr.io/wehi-soda-hub/cellmeasurement:0.2.1"
 
     input:
     tuple val(meta),
