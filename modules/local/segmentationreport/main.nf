@@ -3,7 +3,7 @@ process SEGMENTATIONREPORT {
     label 'process_high'
 
     conda "${moduleDir}/environment.yml"
-    container 'ghcr.io/wehi-soda-hub/spatialvis:0.1.6'
+    container 'ghcr.io/wehi-soda-hub/spatialvis:0.1.7'
 
     input:
     tuple val(meta),
