@@ -26,6 +26,10 @@ process SEGMENTATIONREPORT {
     def prefix = task.ext.prefix ?: "${meta.id}"
     def args = task.ext.args ?: ''
     """
+    # Process-specific cache directory to avoid cache conflicts
+    export XDG_CACHE_HOME="\$(pwd)/.quarto_cache"
+    mkdir -p "\$XDG_CACHE_HOME"
+
     Rscript -e "spatialVis::copy_report_template(
         template_name = 'segmentation_report_template.qmd',
         output_dir = '.',
