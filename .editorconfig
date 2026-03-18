@@ -38,3 +38,4 @@ indent_style = unset
 indent_size = unset
 end_of_line = unset
 insert_final_newline = unset
+charset = unset

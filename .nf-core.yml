@@ -38,6 +38,7 @@ lint:
     - docs/README.md
     - .prettierignore
     - .prettierrc.yml
+  schema_params: false
   multiqc_config: false
   nextflow_config: false
 nf_core_version: 3.3.2
