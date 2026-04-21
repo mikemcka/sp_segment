@@ -8,8 +8,8 @@ process SOPA_SEGMENTATIONCELLPOSE {
 
     conda "${moduleDir}/environment.yml"
     container "${workflow.containerEngine == 'apptainer' && !task.ext.singularity_pull_docker_container
-        ? 'docker://quentinblampey/sopa:2.0.7-cellpose'
-        : 'docker.io/quentinblampey/sopa:2.0.7-cellpose'}"
+        ? 'docker://quentinblampey/sopa:2.1.11-cellpose'
+        : 'docker.io/quentinblampey/sopa:2.1.11-cellpose'}"
 
     input:
     tuple val(meta), path(zarr), val(index), val(n_patches), val(nuclear_channel), val(membrane_channel)
@@ -20,8 +20,10 @@ process SOPA_SEGMENTATIONCELLPOSE {
 
     script:
     def args = task.ext.args ?: ''
-    def membrane_channel_arg = membrane_channel ? "--channels \"${membrane_channel}\"" : ""
+    def membrane_channel_arg = (membrane_channel && membrane_channel != "[]") ? "--channels \"${membrane_channel}\"" : ""
     """
+    export NUMBA_CACHE_DIR=\$PWD/.numba_cache
+
     sopa segmentation cellpose \\
         ${args} \\
         --patch-index ${index} \\

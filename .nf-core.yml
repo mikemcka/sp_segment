@@ -46,7 +46,7 @@ org_path: null
 repository_type: pipeline
 template:
   author: WEHI SODA Hub
-  description: Cell segmentation and downstream analysis pipeline for the COMET and MIBI spatial platforms
+  description: Cell segmentation and downstream analysis pipeline for the COMET, MIBI, and OPAL spatial platforms
   force: true
   is_nfcore: true
   name: spatialproteomics

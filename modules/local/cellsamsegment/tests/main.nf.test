@@ -1,0 +1,88 @@
+nextflow_process {
+
+    name "Test Process CELLSAMSEGMENT"
+    script "../main.nf"
+    process "CELLSAMSEGMENT"
+
+    tag "modules"
+    tag "modules_local"
+    tag "cellsamsegment"
+
+    test("cellsamsegment - nuclear segmentation") {
+
+        when {
+            process {
+                """
+                input[0] = [
+                    [ id:'test_nuclear' ], // meta map
+                    file('${projectDir}/tests/data/mesmer/test_data.tiff'), // tiff
+                    "nuclear", // nuclear_channel
+                    "membrane" // membrane_channels
+                ]
+                input[1] = "nuclear" // compartment
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert process.success },
+                { assert snapshot(process.out).match() }
+            )
+        }
+
+    }
+
+    test("cellsamsegment - whole-cell segmentation") {
+
+        when {
+            process {
+                """
+                input[0] = [
+                    [ id:'test_whole_cell' ], // meta map
+                    file('${projectDir}/tests/data/mesmer/test_data.tiff'), // tiff
+                    "nuclear", // nuclear_channel
+                    "membrane" // membrane_channels
+                ]
+                input[1] = "whole-cell" // compartment
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert process.success },
+                { assert snapshot(process.out).match() }
+            )
+        }
+
+    }
+
+    test("cellsamsegment - stub") {
+
+        options "-stub"
+
+        when {
+            process {
+                """
+                input[0] = [
+                    [ id:'test_stub' ], // meta map
+                    file('${projectDir}/tests/data/mesmer/test_data.tiff'), // tiff
+                    "nuclear", // nuclear_channel
+                    "membrane" // membrane_channels
+                ]
+                input[1] = "nuclear" // compartment
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert process.success },
+                { assert snapshot(process.out).match() }
+            )
+        }
+
+    }
+
+}

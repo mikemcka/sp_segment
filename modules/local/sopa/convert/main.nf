@@ -8,8 +8,8 @@ process SOPA_CONVERT {
 
     conda "${moduleDir}/environment.yml"
     container "${workflow.containerEngine == 'apptainer' && !task.ext.singularity_pull_docker_container
-        ? 'docker://quentinblampey/sopa:2.0.7'
-        : 'docker.io/quentinblampey/sopa:2.0.7'}"
+        ? 'docker://quentinblampey/sopa:2.1.11'
+        : 'docker.io/quentinblampey/sopa:2.1.11'}"
 
     input:
     tuple val(meta), path(tiff)

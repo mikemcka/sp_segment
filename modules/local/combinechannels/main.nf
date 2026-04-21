@@ -18,14 +18,15 @@ process COMBINECHANNELS {
     script:
     def args = task.ext.args ?: ''
     prefix = task.ext.prefix ?: "${meta.id}"
-    def membrane_channel_args = membrane_channels.first() != [] ?
-        membrane_channels.first().split(":").collect {
-            "--membrane-channel \"${it}\""
+
+    def membrane_channel_args = membrane_channels != '' && membrane_channels != [] ?
+        membrane_channels.split(":").collect { channel ->
+            "--membrane-channel \"${channel}\""
         }.join(' ') : ''
     """
     combine_channels.py \\
         $args \\
-        --nuclear-channel "${nuclear_channel.first()}" \\
+        --nuclear-channel "${nuclear_channel}" \\
         ${membrane_channel_args} \\
         $tiff > ${prefix}_combined_channels.tiff
 

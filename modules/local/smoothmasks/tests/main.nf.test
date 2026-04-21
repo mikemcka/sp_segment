@@ -1,0 +1,59 @@
+nextflow_process {
+
+    name "Test Process SMOOTHMASKS"
+    script "../main.nf"
+    process "SMOOTHMASKS"
+
+    tag "modules"
+    tag "modules_local"
+    tag "smoothmasks"
+
+    test("smoothmasks - basic functionality") {
+
+        when {
+            process {
+                """
+                input[0] = [
+                    [ id:'test' ],
+                    file('${projectDir}/tests/data/mesmer/test_data_whole-cell.tiff', checkIfExists: true)
+                ]
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert process.success },
+                { assert process.out.smoothed_mask },
+                { assert process.out.versions }
+            )
+        }
+
+    }
+
+    test("smoothmasks - stub") {
+
+        options "-stub"
+
+        when {
+            process {
+                """
+                input[0] = [
+                    [ id:'test_stub' ],
+                    file('${projectDir}/tests/data/mesmer/test_data_whole-cell.tiff', checkIfExists: true)
+                ]
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert process.success },
+                { assert process.out.smoothed_mask },
+                { assert process.out.versions }
+            )
+        }
+
+    }
+
+}

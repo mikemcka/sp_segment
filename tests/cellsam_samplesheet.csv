@@ -1,0 +1,2 @@
+sample,run_backsub,run_cellpose,run_mesmer,run_cellsam,tiff,nuclear_channel,membrane_channels
+test,true,false,false,true,tests/data/comet/synthetic_multichannel.tif,DAPI,CD45

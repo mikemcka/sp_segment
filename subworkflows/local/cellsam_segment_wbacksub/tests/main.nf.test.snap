@@ -1,0 +1,87 @@
+{
+    "cellsam_segment_wbacksub - tiff with background subtraction": {
+        "content": [
+            {
+                "0": [
+                    [
+                        {
+                            "id": "test_wbacksub"
+                        },
+                        "test_wbacksub_nuclear.tiff:md5,bd3a7de3a5dd10ac14c96a03b5a3ee76"
+                    ]
+                ],
+                "1": [
+                    [
+                        {
+                            "id": "test_wbacksub"
+                        },
+                        "test_wbacksub_whole-cell.tiff:md5,98a3664e77ac2cc70b4355a1d7845c7c"
+                    ]
+                ],
+                "2": [
+                    [
+                        {
+                            "id": "test_wbacksub"
+                        },
+                        "test_wbacksub.geojson:md5,45ab6c2add5bc2de0bfe51ffb5b6ee7f"
+                    ]
+                ],
+                "3": [
+                    
+                ],
+                "4": [
+                    
+                ],
+                "5": [
+                    
+                ],
+                "6": [
+                    "versions.yml:md5,190ed3ef9c713c670798c907d354d57f",
+                    "versions.yml:md5,e76f1993b58b19b4ce6257944d07b98c"
+                ],
+                "annotations": [
+                    [
+                        {
+                            "id": "test_wbacksub"
+                        },
+                        "test_wbacksub.geojson:md5,45ab6c2add5bc2de0bfe51ffb5b6ee7f"
+                    ]
+                ],
+                "kronos_embeddings": [
+                    
+                ],
+                "kronos_marker_report": [
+                    
+                ],
+                "nuclear_segmentation_mask": [
+                    [
+                        {
+                            "id": "test_wbacksub"
+                        },
+                        "test_wbacksub_nuclear.tiff:md5,bd3a7de3a5dd10ac14c96a03b5a3ee76"
+                    ]
+                ],
+                "report": [
+                    
+                ],
+                "versions": [
+                    "versions.yml:md5,190ed3ef9c713c670798c907d354d57f",
+                    "versions.yml:md5,e76f1993b58b19b4ce6257944d07b98c"
+                ],
+                "wholecell_segmentation_mask": [
+                    [
+                        {
+                            "id": "test_wbacksub"
+                        },
+                        "test_wbacksub_whole-cell.tiff:md5,98a3664e77ac2cc70b4355a1d7845c7c"
+                    ]
+                ]
+            }
+        ],
+        "meta": {
+            "nf-test": "0.9.2",
+            "nextflow": "25.04.4"
+        },
+        "timestamp": "2026-04-20T14:44:20.654858668"
+    }
+}

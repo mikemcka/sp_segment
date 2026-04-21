@@ -1,0 +1,83 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/nf-core/modules/master/modules/meta-schema.json
+name: "kronosembeddings"
+description: Extract KRONOS foundation model embeddings for each segmented cell in a multiplexed image
+keywords:
+  - kronos
+  - embeddings
+  - foundation model
+  - cell phenotyping
+  - multiplexed imaging
+  - spatial proteomics
+tools:
+  - "kronos":
+      description: "KRONOS is a foundation model for multiplex spatial proteomic images that generates cell and patch embeddings from multiplexed tissue images."
+      homepage: "https://github.com/mahmoodlab/KRONOS"
+      documentation: "https://github.com/mahmoodlab/KRONOS#readme"
+      tool_dev_url: "https://github.com/mahmoodlab/KRONOS"
+      doi: ""
+      licence: "CC-BY-NC-ND-4.0"
+      identifier: ""
+
+input:
+  - - meta:
+        type: map
+        description: |
+          Groovy Map containing sample information
+          e.g. `[ id:'sample1' ]`
+    - tiff:
+        type: file
+        description: TIFF file containing multi-channel multiplexed image data
+        pattern: "*.{tiff,tif}"
+        ontologies:
+          - edam: "http://edamontology.org/format_3591"
+    - whole_cell_mask:
+        type: file
+        description: Whole-cell segmentation mask file in TIFF format
+        pattern: "*.{tiff,tif}"
+        ontologies:
+          - edam: "http://edamontology.org/format_3591"
+
+  - - kronos_model:
+        type: directory
+        description: Directory containing the KRONOS model weights (.pt file) and config.json
+  - - marker_metadata:
+        type: file
+        description: |
+          CSV file containing KRONOS marker metadata with columns marker_name, marker_id, marker_mean, marker_std.
+          This file maps marker names to the KRONOS model's internal marker IDs and provides normalization statistics.
+        pattern: "*.csv"
+
+output:
+  - embeddings:
+      - meta:
+          type: map
+          description: |
+            Groovy Map containing sample information
+            e.g. `[ id:'sample1' ]`
+      - "*_kronos_embeddings.csv":
+          type: file
+          description: CSV file containing per-cell KRONOS embeddings with columns cell_id, y_center, x_center, emb_0, ..., emb_N
+          pattern: "*_kronos_embeddings.csv"
+
+  - marker_report:
+      - meta:
+          type: map
+          description: |
+            Groovy Map containing sample information
+            e.g. `[ id:'sample1' ]`
+      - "*_marker_report.txt":
+          type: file
+          description: Text file reporting which markers were matched to KRONOS metadata and suggestions for unmatched markers
+          pattern: "*_marker_report.txt"
+
+  - versions:
+      - "versions.yml":
+          type: file
+          description: File containing software versions
+          pattern: "versions.yml"
+
+authors:
+  - "@mikemcka"
+maintainers:
+  - "@mcmero"

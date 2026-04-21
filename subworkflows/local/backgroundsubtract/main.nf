@@ -8,7 +8,7 @@ workflow BACKGROUNDSUBTRACT {
 
     main:
 
-    ch_versions = Channel.empty()
+    ch_versions = channel.empty()
 
     //
     // Extract markers from the input tiff file

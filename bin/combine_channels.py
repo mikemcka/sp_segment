@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 '''
 Module      : combine_channels
-Description : Takes an OME-TIFF containing N channels and returns a 2 channel tiff
+Description : Takes an OME-TIFF (including OPAL OME/QPTIFF) containing N
+              channels and returns a 2 channel tiff
               containing a nuclear channel and membrane channel that is componsed
               of one or more channels from the input tiff, usign either the product
               or max of the intensities.
@@ -16,7 +17,7 @@ import sys
 import xml.etree.ElementTree as ET
 from enum import Enum
 from pathlib import Path
-from typing import Annotated, List
+from typing import Annotated, Any, Dict, List, Optional, Tuple
 
 import typer
 import numpy as np
@@ -29,37 +30,61 @@ class CombineMethod(str, Enum):
     MAX = "max"
 
 
+def _local_tag_name(tag: str) -> str:
+    """
+    Return XML tag name without namespace.
+    """
+    return tag.split('}', 1)[-1]
+
+
 def get_pixels_tag(xml_str: str) -> ET.Element:
     """
     Parses the OME-XML string and returns the Pixels tag.
     """
     root = ET.fromstring(xml_str)
-    ns = {'ome': root.tag.split('}')[0].strip('{')}
-    image_tag = root.find('ome:Image', ns)
+
+    image_tag: Optional[ET.Element] = None
+    for elem in root.iter():
+        if _local_tag_name(elem.tag) == 'Image':
+            image_tag = elem
+            break
 
     if image_tag is None:
         raise ValueError("No Image tag found in the XML.")
 
-    pixels_tag = image_tag.find('ome:Pixels', ns)
-    if pixels_tag is None:
-        raise ValueError("No Pixels tag found in the Image tag.")
+    for child in image_tag:
+        if _local_tag_name(child.tag) == 'Pixels':
+            return child
 
-    return pixels_tag
+    raise ValueError("No Pixels tag found in the Image tag.")
 
 
-def ome_extract_channel_names(xml_str) -> List[str]:
+def ome_extract_channel_names(xml_str: str) -> List[str]:
     """
     Extracts all channel 'Name' attributes from OME-XML in the order they
     appear. Returns a list of channel names by index.
     """
     pixels_tag = get_pixels_tag(xml_str)
 
-    root = ET.fromstring(xml_str)
-    ns = {'ome': root.tag.split('}')[0].strip('{')}
-    channel_tags = pixels_tag.findall('ome:Channel', ns)
-
-    channel_names = [ch.get('Name', 'Unknown') for ch in channel_tags]
+    channel_tags = [
+        ch for ch in list(pixels_tag)
+        if _local_tag_name(ch.tag) == 'Channel'
+    ]
+    channel_names = [ch.get('Name', ch.get('ID', 'Unknown')) for ch in channel_tags]
     return channel_names
+
+
+def ome_extract_pixels_metadata(xml_str: str) -> Dict[str, Any]:
+    """
+    Extract commonly used metadata fields from OME-XML Pixels tag.
+    """
+    pixels_tag = get_pixels_tag(xml_str)
+
+    fields = [
+        "DimensionOrder", "Type", "SizeX", "SizeY", "SizeZ", "SizeC", "SizeT",
+        "PhysicalSizeX", "PhysicalSizeY", "PhysicalSizeXUnit", "PhysicalSizeYUnit",
+    ]
+    return {f: pixels_tag.get(f) for f in fields if pixels_tag.get(f) is not None}
 
 
 def json_extract_channel_names(pages) -> List[str]:
@@ -75,22 +100,80 @@ def json_extract_channel_names(pages) -> List[str]:
     return channel_names
 
 
+def imagej_extract_channel_names(tiff: TiffFile) -> List[str]:
+    """
+    Extract channel names from ImageJ metadata when available.
+    """
+    imagej_metadata = getattr(tiff, "imagej_metadata", None)
+    if not imagej_metadata or not isinstance(imagej_metadata, dict):
+        return []
+
+    labels = imagej_metadata.get("Labels")
+    if not labels:
+        return []
+
+    return [str(label) for label in labels]
+
+
+def detect_channel_names_and_metadata(tiff: TiffFile) -> Tuple[List[str], Dict[str, Any], str]:
+    """
+    Detect channel names and metadata from supported TIFF metadata formats.
+
+    Returns:
+        (channel_names, metadata_attrs, metadata_source)
+    """
+    channel_names: List[str] = []
+    metadata_attrs: Dict[str, Any] = {}
+    metadata_source = "unknown"
+
+    # MIBI JSON metadata in per-page ImageDescription
+    first_page = tiff.pages[0]
+    try:
+        json.loads(first_page.description)
+        channel_names = json_extract_channel_names(tiff.pages)
+        metadata_source = "mibi-json"
+    except (json.JSONDecodeError, TypeError):
+        pass
+
+    # OME metadata (covers standard OME-TIFF and OPAL OME/QPTIFF exports)
+    if not channel_names:
+        ome_xml = tiff.ome_metadata
+        if not ome_xml and isinstance(first_page.description, str):
+            description = first_page.description.strip()
+            if description.startswith("<"):
+                ome_xml = first_page.description
+
+        if ome_xml:
+            try:
+                channel_names = ome_extract_channel_names(ome_xml)
+                metadata_attrs.update(ome_extract_pixels_metadata(ome_xml))
+                metadata_source = "ome-xml"
+            except (ET.ParseError, ValueError, TypeError):
+                pass
+
+    # ImageJ metadata (e.g. OPAL exports without embedded OME-XML)
+    if not channel_names:
+        channel_names = imagej_extract_channel_names(tiff)
+        if channel_names:
+            metadata_source = "imagej"
+
+    return channel_names, metadata_attrs, metadata_source
+
+
 def tiff_to_xarray(tiffPath: Path) -> DataArray:
     """
     Takes a TIFF and converts it to an xarray with relevant axis,
-    coordinate and metadata attached. Supports MIBI TIFF and OME-TIFF.
+    coordinate and metadata attached. Supports MIBI TIFF, OME-TIFF,
+    and OPAL OME/QPTIFF exports.
     Uses memory mapping to avoid loading the entire image into memory.
     """
-    channel_names: list[str] = []
-    attrs: dict[str, float] = {}
+    channel_names: List[str] = []
+    attrs: Dict[str, Any] = {}
 
     with TiffFile(tiffPath) as tiff:
-        first_page = tiff.pages[0]
-        try:
-            json.loads(first_page.description)
-            channel_names = json_extract_channel_names(tiff.pages)
-        except (json.JSONDecodeError, TypeError):
-            channel_names = ome_extract_channel_names(first_page.description)
+        channel_names, extracted_attrs, metadata_source = detect_channel_names_and_metadata(tiff)
+        attrs.update(extracted_attrs)
+        attrs["metadata_source"] = metadata_source
 
         if len(tiff.pages) > 1:
             # Stack pages using memory mapping
@@ -98,6 +181,26 @@ def tiff_to_xarray(tiffPath: Path) -> DataArray:
             data = np.stack(arrays, axis=0)
         else:
             data = tiff.asarray()
+            # Single-page TIFFs with interleaved channels have shape (Y, X, C).
+            # Transpose to (C, Y, X) if the last axis matches known channel names,
+            # or if it looks like a channel axis (much smaller than spatial dims)
+            # when metadata is absent.
+            if data.ndim == 3:
+                last_matches_names = bool(channel_names) and data.shape[2] == len(channel_names)
+                looks_like_channel_last = (
+                    not channel_names and data.shape[2] < data.shape[0] and data.shape[2] < data.shape[1]
+                )
+                if last_matches_names or looks_like_channel_last:
+                    data = np.transpose(data, (2, 0, 1))
+
+        if not channel_names and data.ndim == 3:
+            channel_names = [f"Channel_{i}" for i in range(data.shape[0])]
+
+        if not channel_names:
+            raise ValueError(
+                "Could not detect channel names from TIFF metadata. "
+                "Please provide an image with OME or MIBI metadata."
+            )
 
         return DataArray(data=data, dims=["C", "Y", "X"],
                          coords={"C": channel_names}, attrs=attrs)
@@ -143,12 +246,69 @@ def combine_channels(array: DataArray, channels: List[str], combined_name: str,
                      coords={"C": new_coords}, attrs=array.attrs)
 
 
+def create_ome_xml(width: int, height: int,
+                   num_channels: int, channel_names: List[str],
+                   pixel_size_microns: Optional[float] = None) -> str:
+    """
+    Create minimal OME-XML metadata from scratch with the given channel names.
+    Used when the source image has no OME-XML (e.g. MIBI TIFF with JSON metadata).
+    """
+    ome_ns = "http://www.openmicroscopy.org/Schemas/OME/2016-06"
+    xsi_ns = "http://www.w3.org/2001/XMLSchema-instance"
+    schema_loc = (
+        "http://www.openmicroscopy.org/Schemas/OME/2016-06 "
+        "http://www.openmicroscopy.org/Schemas/OME/2016-06/ome.xsd"
+    )
+    ET.register_namespace("", ome_ns)
+    ET.register_namespace("xsi", xsi_ns)
+
+    # Pre-build Clark-notation tag names to avoid {{{ patterns that trip nf-core linting
+    tag_ome = "{" + ome_ns + "}"
+    tag_xsi = "{" + xsi_ns + "}"
+
+    root = ET.Element(tag_ome + "OME")
+    root.set(tag_xsi + "schemaLocation", schema_loc)
+
+    image = ET.SubElement(root, tag_ome + "Image", {"ID": "Image:0", "Name": "combined"})
+    pixels_attrs = {
+        "ID": "Pixels:0",
+        "DimensionOrder": "XYZCT",
+        "Type": "uint16",
+        "SizeX": str(width),
+        "SizeY": str(height),
+        "SizeZ": "1",
+        "SizeC": str(num_channels),
+        "SizeT": "1",
+    }
+    if pixel_size_microns is not None:
+        pixels_attrs["PhysicalSizeX"] = str(pixel_size_microns)
+        pixels_attrs["PhysicalSizeY"] = str(pixel_size_microns)
+        pixels_attrs["PhysicalSizeXUnit"] = "µm"
+        pixels_attrs["PhysicalSizeYUnit"] = "µm"
+    pixels = ET.SubElement(image, tag_ome + "Pixels", pixels_attrs)
+    for c, name in enumerate(channel_names):
+        ET.SubElement(pixels, tag_ome + "Channel", {
+            "ID": f"Channel:0:{c}",
+            "Name": name,
+            "SamplesPerPixel": "1",
+        })
+    tiff_data = ET.SubElement(pixels, tag_ome + "TiffData")
+    tiff_data.set("PlaneCount", str(num_channels))
+
+    xml_str = '<?xml version="1.0" encoding="UTF-8"?>\n' + \
+        ET.tostring(root, encoding='unicode')
+    return xml_str
+
+
 def update_ome_xml(original_xml: str, width: int, height: int,
                    num_channels: int, channel_names: List[str]) -> str:
     """
     Update existing OME-XML metadata with new channel information.
     """
     try:
+        if isinstance(original_xml, bytes):
+            original_xml = original_xml.decode('utf-8', errors='replace')
+
         original_xml = re.sub(r'<\?xml[^>]+\?>', '<?xml version="1.0"?>', original_xml)
         root = ET.fromstring(original_xml)
 
@@ -210,6 +370,10 @@ def main(
     combine_method: Annotated[CombineMethod, typer.Option(
         help="Method to use for combining channels (prod or max).")
     ] = CombineMethod.PROD,
+    pixel_size_microns: Annotated[Optional[float], typer.Option(
+        help="Pixel size in microns. Written to OME-XML PhysicalSizeX/Y when "
+             "the source image has no calibration metadata.")
+    ] = None,
 ):
     full_array = tiff_to_xarray(tiff)
 
@@ -230,7 +394,7 @@ def main(
     del full_array
 
     with TiffFile(tiff) as tif:
-        ome_metadata = tif.pages[0].description
+        ome_metadata = tif.ome_metadata or tif.pages[0].description
 
     # Update OME-XML metadata
     c, height, width = output_array.shape
@@ -239,9 +403,11 @@ def main(
                                           final_channels)
         updated_metadata = updated_metadata.encode('utf-8')
     except ValueError as e:
-        typer.echo(f"Warning: {e} Proceeding without updated OME-XML metadata.",
+        typer.echo(f"Warning: {e} Creating OME-XML from scratch.",
                    err=True)
-        updated_metadata = ""
+        updated_metadata = create_ome_xml(width, height, c,
+                                          final_channels,
+                                          pixel_size_microns).encode('utf-8')
 
     imwrite(sys.stdout.buffer, output_array,
             photometric='minisblack',

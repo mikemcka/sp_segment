@@ -2,7 +2,7 @@
     "$schema": "https://json-schema.org/draft/2020-12/schema",
     "$id": "https://raw.githubusercontent.com/WEHI-SODA-Hub/sp_segment/master/nextflow_schema.json",
     "title": "WEHI-SODA-Hub/sp_segment pipeline parameters",
-    "description": "Cell segmentation and downstream analysis pipeline for the COMET and MIBI spatial platforms",
+    "description": "Cell segmentation and downstream analysis pipeline for the COMET, MIBI, and OPAL spatial platforms",
     "type": "object",
     "$defs": {
         "input_output_options": {
@@ -84,7 +84,7 @@
                 },
                 "patch_overlap_pixel": {
                     "type": "integer",
-                    "description": "Pixel overlap of patches.",
+                    "description": "Pixel overlap of patches. This should be set to at least the size of the largest cell in the image to ensure that cells are not split across patches.",
                     "fa_icon": "fas fa-crop"
                 }
             }
@@ -180,6 +180,243 @@
                     "description": "Number of pixels to crop the image by on each side before segmentation.",
                     "fa_icon": "fas fa-crop",
                     "minimum": 0
+                },
+                "mesmer_transpose_mask": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Force-transpose the Mesmer output mask. Enable this if the segmentation result appears spatially flipped relative to the input image.",
+                    "fa_icon": "fas fa-exchange-alt"
+                }
+            }
+        },
+        "cellsam_options": {
+            "title": "CellSAM options",
+            "type": "object",
+            "fa_icon": "fas fa-brain",
+            "description": "Parameters used by CellSAM for foundation model cell segmentation.",
+            "properties": {
+                "cellsam_bbox_threshold": {
+                    "type": "number",
+                    "default": 0.4,
+                    "description": "Confidence threshold for cell detection. Lower values (0.3-0.4) increase recall for out-of-distribution images.",
+                    "fa_icon": "fas fa-tachometer-alt",
+                    "minimum": 0.0,
+                    "maximum": 1.0
+                },
+                "cellsam_block_size": {
+                    "type": "integer",
+                    "default": 600,
+                    "description": "Tile size for large image processing. Recommended: 256-512 for dense images, 400-600 for sparse.",
+                    "fa_icon": "fas fa-th",
+                    "minimum": 128,
+                    "maximum": 2048
+                },
+                "cellsam_overlap": {
+                    "type": "integer",
+                    "default": 250,
+                    "description": "Tile overlap region in pixels. Should encompass typical cell size for proper merging.",
+                    "fa_icon": "fas fa-compress-arrows-alt",
+                    "minimum": 0,
+                    "maximum": 256
+                },
+                "cellsam_iou_depth": {
+                    "type": "integer",
+                    "default": 250,
+                    "description": "Depth for IOU-based label merging across tiles. 250 works well for COMET images.",
+                    "fa_icon": "fas fa-layer-group",
+                    "minimum": 0,
+                    "maximum": 256
+                },
+                "cellsam_iou_threshold": {
+                    "type": "number",
+                    "default": 0.5,
+                    "description": "IOU threshold for merging overlapping labels across tiles.",
+                    "fa_icon": "fas fa-project-diagram",
+                    "minimum": 0.0,
+                    "maximum": 1.0
+                },
+                "cellsam_use_wsi": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Enable tiling for large images. Recommended for images with >3000 cells.",
+                    "fa_icon": "fas fa-th-large"
+                },
+                "cellsam_gauge_cell_size": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Perform preliminary segmentation to estimate cell sizes.",
+                    "fa_icon": "fas fa-ruler-combined"
+                },
+                "cellsam_low_contrast_enhancement": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Apply contrast enhancement preprocessing for low-contrast images.",
+                    "fa_icon": "fas fa-adjust"
+                },
+                "cellsam_model_path": {
+                    "type": "string",
+                    "description": "Path to custom CellSAM model weights. If not specified, uses latest generalist model (v1.2 with DEEPCELL_ACCESS_TOKEN).",
+                    "fa_icon": "fas fa-file-medical",
+                    "format": "file-path"
+                },
+                "cellsam_min_area": {
+                    "type": "integer",
+                    "default": 0,
+                    "description": "Minimum area in pixels for cells/nuclei. Segmented objects smaller than this are removed. Set to 0 to disable.",
+                    "fa_icon": "fas fa-compress-arrows-alt"
+                }
+            }
+        },
+        "kronos_options": {
+            "title": "KRONOS options",
+            "type": "object",
+            "fa_icon": "fas fa-dna",
+            "description": "Parameters for KRONOS foundation model cell embedding extraction.",
+            "help_text": "KRONOS is a foundation model for multiplex spatial proteomic images. These parameters control the embedding extraction step that runs after cell measurement.",
+            "properties": {
+                "skip_kronos": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Skip KRONOS embedding extraction step.",
+                    "fa_icon": "fas fa-stopwatch",
+                    "help_text": "Set this to `false` to run KRONOS embedding extraction after cell measurement. Requires kronos_model_path and kronos_marker_metadata to be set."
+                },
+                "kronos_model_path": {
+                    "type": "string",
+                    "format": "directory-path",
+                    "description": "Path to directory containing KRONOS model weights (.pt file) and config.json.",
+                    "fa_icon": "fas fa-file-medical",
+                    "help_text": "The directory should contain the model checkpoint (e.g. kronos_vits16_model.pt) and optionally a config.json file. Download from https://github.com/mahmoodlab/KRONOS or Hugging Face Hub (MahmoodLab/kronos)."
+                },
+                "kronos_config_path": {
+                    "type": "string",
+                    "format": "file-path",
+                    "description": "Optional path to KRONOS config.json. If unset, the script auto-detects it from kronos_model_path.",
+                    "fa_icon": "fas fa-file-code",
+                    "help_text": "Use this only when auto-detection fails or when you need to force a specific KRONOS configuration file."
+                },
+                "kronos_marker_metadata": {
+                    "type": "string",
+                    "format": "file-path",
+                    "description": "Path to KRONOS marker metadata CSV file with columns: marker_name, marker_id, marker_mean, marker_std.",
+                    "fa_icon": "fas fa-file-csv",
+                    "help_text": "This CSV maps marker names to KRONOS internal marker IDs and provides normalization statistics. A default metadata file is provided with the KRONOS repository. KRONOS uses fuzzy string matching to match image channel names to the metadata, but exact matches are preferred."
+                },
+                "kronos_patch_size": {
+                    "type": "integer",
+                    "default": 64,
+                    "description": "Size of cell-centered patches to extract for KRONOS inference.",
+                    "fa_icon": "fas fa-crop",
+                    "minimum": 16,
+                    "maximum": 256,
+                    "help_text": "The patch size in pixels for cell-centered crops. Larger patches capture more context but increase computation. Typical values are 32-128."
+                },
+                "kronos_batch_size": {
+                    "type": "integer",
+                    "default": 32,
+                    "description": "Batch size for KRONOS model inference.",
+                    "fa_icon": "fas fa-layer-group",
+                    "minimum": 1,
+                    "maximum": 512,
+                    "help_text": "Number of cell patches to process simultaneously. Larger batch sizes are faster but require more GPU memory."
+                },
+                "kronos_num_workers": {
+                    "type": "integer",
+                    "default": 4,
+                    "description": "Number of parallel DataLoader workers for loading and preprocessing cell patches.",
+                    "fa_icon": "fas fa-cogs",
+                    "minimum": 0,
+                    "maximum": 32,
+                    "help_text": "Controls how many CPU processes load and preprocess patches in parallel while the GPU runs inference. Set to 0 for single-process loading (useful for debugging). On HPC, set this to match the number of CPUs allocated to the KRONOS job for best throughput."
+                },
+                "kronos_max_value": {
+                    "type": "number",
+                    "default": 65535,
+                    "description": "Maximum intensity value for image normalization (65535 for 16-bit images).",
+                    "fa_icon": "fas fa-sliders-h",
+                    "minimum": 1,
+                    "help_text": "Used to scale raw pixel intensities before applying KRONOS normalization. Use 65535 for 16-bit images, 255 for 8-bit."
+                },
+                "kronos_marker_mapping": {
+                    "type": "string",
+                    "description": "JSON string mapping image marker names to KRONOS marker names for markers that cannot be auto-matched.",
+                    "fa_icon": "fas fa-exchange-alt",
+                    "help_text": "Provide a JSON string like '{\"CD3e\": \"CD3E\", \"PanCK\": \"PANCK\"}' to manually resolve marker name mismatches between your image channels and the KRONOS metadata. KRONOS performs case-insensitive matching automatically, so only provide mappings for markers that truly differ in name."
+                },
+                "kronos_distance_threshold": {
+                    "type": "number",
+                    "default": 5.0,
+                    "description": "Maximum centroid distance in pixels for fallback embedding-to-GeoJSON matching.",
+                    "fa_icon": "fas fa-ruler-horizontal",
+                    "minimum": 0,
+                    "help_text": "Used only when merge fallback matching is needed. Increase for noisier centroid alignment; keep low to avoid incorrect cell matches."
+                }
+            }
+        },
+        "mask_smoothing_options": {
+            "title": "Mask smoothing options",
+            "type": "object",
+            "fa_icon": "fas fa-magic",
+            "description": "Parameters for optional mask smoothing before cell measurement.",
+            "help_text": "Enable mask smoothing to reduce polygon complexity in segmentation masks. This can prevent StackOverflowError in QuPath's GeoJSON export when cell ROIs have overly complex/jagged boundaries.",
+            "properties": {
+                "smooth_masks": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Enable mask smoothing before cell measurement.",
+                    "fa_icon": "fas fa-wave-square",
+                    "help_text": "When enabled, segmentation masks are smoothed to reduce polygon complexity before being passed to cellmeasurement. Choose the method with smooth_method."
+                },
+                "smooth_method": {
+                    "type": "string",
+                    "default": "morphological",
+                    "description": "Smoothing algorithm: 'morphological' (disk close+open) or 'shapely' (Douglas-Peucker polygon simplification).",
+                    "fa_icon": "fas fa-cogs",
+                    "enum": ["morphological", "shapely"],
+                    "help_text": "'morphological' applies binary close then open with a disk kernel to smooth pixel boundaries. 'shapely' extracts the polygon boundary for each label and applies Shapely's simplify (Douglas-Peucker) algorithm, which directly reduces vertex count — the main cause of StackOverflowError in QuPath GeoJSON export."
+                },
+                "smooth_kernel_size": {
+                    "type": "integer",
+                    "default": 2,
+                    "minimum": 1,
+                    "maximum": 10,
+                    "description": "Disk radius for morphological close+open smoothing (pixels).",
+                    "fa_icon": "fas fa-circle",
+                    "help_text": "Larger values produce smoother boundaries but may merge nearby cells. Only used when smooth_masks is enabled."
+                },
+                "smooth_n_workers": {
+                    "type": "integer",
+                    "default": 8,
+                    "minimum": 1,
+                    "maximum": 64,
+                    "description": "Number of parallel worker processes for smoothing.",
+                    "fa_icon": "fas fa-tasks",
+                    "help_text": "Set to match available CPUs for optimal performance. Should match --cpus-per-task in your resource configuration"
+                },
+                "smooth_chunksize": {
+                    "type": "integer",
+                    "default": 200,
+                    "minimum": 1,
+                    "maximum": 10000,
+                    "description": "Number of labels per worker chunk.",
+                    "fa_icon": "fas fa-layer-group",
+                    "help_text": "Tune based on cell size distribution. Larger values for many small cells, smaller values for fewer large cells."
+                },
+                "smooth_tolerance": {
+                    "type": "number",
+                    "default": 1,
+                    "minimum": 0.01,
+                    "description": "[shapely] Douglas-Peucker simplification tolerance in pixels.",
+                    "fa_icon": "fas fa-sliders-h",
+                    "help_text": "Controls how aggressively polygon boundaries are simplified when smooth_method is 'shapely'. Higher values produce simpler (fewer vertex) polygons but less accurate boundaries. Important to minimise vertex count to prevent StackOverflowError in QuPath GeoJSON export. Tune based on typical cell size and boundary complexity. Start with threshold 1 and adjust as needed."
+                },
+                "smooth_min_area": {
+                    "type": "number",
+                    "default": 0,
+                    "minimum": 0,
+                    "description": "[shapely] Minimum polygon area in pixels² to retain after simplification.",
+                    "fa_icon": "fas fa-compress-arrows-alt",
+                    "help_text": "Labels whose simplified polygon area falls below this threshold are removed from the output mask. Useful for discarding fragments created by aggressive simplification. Only used when smooth_method is 'shapely'."
                 }
             }
         },
@@ -199,17 +436,32 @@
                 },
                 "percentiles": {
                     "type": "string",
+                    "default": "70,80,90,95,99",
                     "description": "Comma-separated list of percentiles to calculate for each marker (e.g. 80,90,95,99).",
                     "fa_icon": "fas fa-percentage",
                     "pattern": "^(100|[1-9]?[0-9][\\.]?[0-9]*)(,(100|[1-9]?[0-9][\\.]?[0-9]*))*$",
-                    "help_text": "A comma-separated list of percentiles to calculate for each marker. Each value must be between 0 and 100. Skip measurements must be set to `false` to use this parameter."
+                    "help_text": "A comma-separated list of percentiles to calculate for each marker. Each value must be between 0 and 100. Default: 70,80,90,95,99. Skip measurements must be set to `false` to use this parameter."
                 },
                 "erosion_steps": {
-                    "type": "string",
-                    "description": "Comma-separated erosion steps in pixels to calculate (e.g. 0,1,2,3).",
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Measure intensity in 5 equal-area erosion bins working inward from the cell/nucleus boundary.",
                     "fa_icon": "fas fa-ruler-combined",
-                    "pattern": "^([0-9]*)(,[0-9]*)*$",
-                    "help_text": "A comma-separated list of erosion steps in pixels to calculate. Each value must be a positive integer. Skip measurements must be set to `false` to use this parameter."
+                    "help_text": "Divides each cell and nucleus mask into 5 concentric zones of approximately equal area by iterative morphological erosion, then measures mean/median intensity per zone. Adapts automatically to cell size. Set to false to disable. Skip measurements must be set to false to use this parameter."
+                },
+                "expansion_steps": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Measure intensity in 5 equal-area annular bins dilated 20 µm outward from the cell boundary (distance computed from pixel_size_microns).",
+                    "fa_icon": "fas fa-expand-arrows-alt",
+                    "help_text": "Divides the 20 µm pericellular zone into 5 rings of approximately equal area and measures mean/median intensity per ring. The total expansion distance is computed automatically from pixel_size_microns. Set to false to disable. Skip measurements must be set to false to use this parameter."
+                },
+                "environment_expansion": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Measure a 20 µm pericellular 'Environment' compartment (distance computed automatically from pixel_size_microns).",
+                    "fa_icon": "fas fa-circle-notch",
+                    "help_text": "Dilates the cell mask by 20 µm (converted to pixels via pixel_size_microns) and measures mean, median, min, max, and std dev of every channel in the full zone (cell boundary to outer ring) as one region. This matches CellTune's 'Environment' compartment. Set to false to disable."
                 },
                 "pixel_size_microns": {
                     "type": "number",
@@ -217,13 +469,48 @@
                     "minimum": 0.1,
                     "maximum": 10.0,
                     "fa_icon": "fas fa-ruler-combined",
-                    "help_text": "For COMET use 0.28 and for MIBI use 0.390625."
+                    "help_text": "COMET: 0.28 µm/px, MIBI: 0.390625 µm/px, OPAL: 0.4964 µm/px."
                 },
                 "estimate_cell_boundary_dist": {
                     "type": "integer",
                     "description": "Where no matching membrane ROI exists, expand the nucleus by this many pixels (default = 3.0).",
                     "fa_icon": "fas fa-expand-arrows-alt",
                     "minimum": 0
+                },
+                "skip_nuclear_mask": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Ignore the nuclear mask and generate ROIs from the whole-cell mask only. Skips compartmental measurements (Nucleus, Cytoplasm, Membrane) but retains Cell, erosion, and expansion measurements.",
+                    "fa_icon": "fas fa-ban"
+                },
+                "neighbors": {
+                    "type": "integer",
+                    "default": 5,
+                    "minimum": 0,
+                    "description": "Number of nearest neighbors for neighborhood feature aggregation (0 = disabled).",
+                    "fa_icon": "fas fa-project-diagram",
+                    "help_text": "For each cell, the max and mean of every numeric measurement are computed across its k closest spatial neighbours (by centroid distance). This produces features like 'Neighbors: Max: CD3: Cell: Mean' and 'Neighbors: Mean: CD3: Cell: Mean'. Set to 0 to disable. Typical values: 5\u201310."
+                },
+                "gzip_geojson": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Gzip-compress the output GeoJSON files. Produces .geojson.gz instead of .geojson.",
+                    "fa_icon": "fas fa-file-archive",
+                    "help_text": "Enable this to gzip-compress the GeoJSON output from cellmeasurement. For large images with hundreds of thousands of cells, the GeoJSON can be 100+ GB uncompressed. Gzip typically achieves 10-20x compression on JSON with floating-point coordinates. The compressed files can be used directly with the import_large_geojson pipeline."
+                },
+                "dist_threshold": {
+                    "type": "number",
+                    "default": 10.0,
+                    "description": "Maximum centroid distance in pixels for matching a nucleus to a whole-cell ROI.",
+                    "fa_icon": "fas fa-ruler",
+                    "help_text": "Nuclear and whole-cell centroids further apart than this threshold are not matched. Unmatched nuclei receive synthetic cell boundaries via watershed. Lower values enforce stricter matching; higher values tolerate more offset between segmentation models."
+                },
+                "downsample_factor": {
+                    "type": "number",
+                    "default": 1.0,
+                    "description": "Downsample factor applied to the image and masks before measurement (1 = no downsampling).",
+                    "fa_icon": "fas fa-compress-arrows-alt",
+                    "help_text": "Integer downsample factor >= 2 to speed up measurement on very large images. The image is block-averaged; masks use block-max to preserve labels. Values < 2 are treated as 1 (no downsampling). Note that physical measurements (area, length) are scaled back to original pixel units."
                 }
             }
         },
@@ -354,12 +641,12 @@
                     "default": "https://raw.githubusercontent.com/nf-core/test-datasets/",
                     "hidden": true
                 },
-                "gradle_cache_dir": {
+                "deepcell_cache_dir": {
                     "type": "string",
                     "format": "directory-path",
-                    "description": "Directory to use for Gradle cache.",
-                    "fa_icon": "fas fa-cogs",
-                    "hidden": true
+                    "description": "Base directory for caching DeepCell/CellSAM model weights. The current username is appended automatically.",
+                    "fa_icon": "fas fa-database",
+                    "help_text": "Set this to redirect the DeepCell model cache away from the home directory. The current username is resolved at runtime and appended, so models are cached at {deepcell_cache_dir}/{username}/.deepcell/models/. Set to null to use $HOME instead."
                 }
             }
         }
@@ -382,6 +669,15 @@
         },
         {
             "$ref": "#/$defs/mesmer_options"
+        },
+        {
+            "$ref": "#/$defs/cellsam_options"
+        },
+        {
+            "$ref": "#/$defs/kronos_options"
+        },
+        {
+            "$ref": "#/$defs/mask_smoothing_options"
         },
         {
             "$ref": "#/$defs/measurement_options"

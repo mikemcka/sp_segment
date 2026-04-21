@@ -11,7 +11,7 @@ keywords:
   - geojson
 tools:
   - "cellmeasurement":
-      description: "Groovy application that extracts Regions of Interest (ROIs) from whole cell and nuclear mask images, matches them based on their centroids, calculates measurements and exports the cell objects as GeoJSON annotations"
+      description: "Python application that extracts Regions of Interest (ROIs) from whole cell and nuclear mask images, matches them based on their centroids, calculates measurements and exports cell objects as GeoJSON annotations. The application has been rewritten into Python in this repository. The original Groovy app is linked in the metadata."
       homepage: "https://github.com/WEHI-SODA-Hub/cellmeasurement"
       documentation: "https://github.com/WEHI-SODA-Hub/cellmeasurement#readme"
       tool_dev_url: "https://github.com/WEHI-SODA-Hub/cellmeasurement"

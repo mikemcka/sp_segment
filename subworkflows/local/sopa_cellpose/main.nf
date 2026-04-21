@@ -15,7 +15,7 @@ workflow SOPA_CELLPOSE {
 
     main:
 
-    ch_versions = Channel.empty()
+    ch_versions = channel.empty()
 
     //
     // Run SOPA segmentation with cellpose

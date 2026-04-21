@@ -1,0 +1,58 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/nf-core/modules/master/subworkflows/yaml-schema.json
+name: "cellsam_segment_wbacksub"
+description: Perform background subtraction followed by CellSAM cell segmentation for both nuclear and whole-cell compartments
+keywords:
+  - segmentation
+  - cellsam
+  - foundation model
+  - background subtraction
+  - nuclear
+  - whole-cell
+  - cell
+  - measurement
+  - microscopy
+components:
+  - backgroundsubtract
+  - cellsam_segment
+input:
+  - ch_cellsam_wbacksub:
+      type: channel
+      description: |
+        The input channel containing sample metadata and TIFF files with channel information
+        Structure: [ val(sample), val(run_backsub), val(run_mesmer), val(run_cellpose), val(run_cellsam), path(tiff), val(nuclear_channel), val(membrane_channels) ]
+      pattern: "*.{tiff,tif}"
+output:
+  - nuclear_segmentation_mask:
+      type: file
+      description: |
+        Channel containing nuclear segmentation mask TIFF files
+        Structure: [ val(meta), path(tiff) ]
+      pattern: "*.tiff"
+  - wholecell_segmentation_mask:
+      type: file
+      description: |
+        Channel containing whole-cell segmentation mask TIFF files
+        Structure: [ val(meta), path(tiff) ]
+      pattern: "*.tiff"
+  - annotations:
+      type: file
+      description: |
+        Channel containing parquet files with cell measurements and annotations
+        Structure: [ val(meta), path(parquet) ]
+      pattern: "*.parquet"
+  - report:
+      type: file
+      description: |
+        Optional segmentation report HTML files
+        Structure: [ val(meta), path(html) ]
+      pattern: "*.html"
+  - versions:
+      type: file
+      description: |
+        File containing software versions
+        Structure: [ path(versions.yml) ]
+      pattern: "versions.yml"
+authors:
+  - "@yourusername"
+maintainers:
+  - "@yourusername"

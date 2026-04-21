@@ -8,7 +8,7 @@ workflow SOPA_SEGMENT_WBACKSUB {
 
     main:
 
-    ch_versions = Channel.empty()
+    ch_versions = channel.empty()
 
     //
     // Run the BACKGROUNDSUBTRACT subworkflow for samples that ONLY require
@@ -44,7 +44,9 @@ workflow SOPA_SEGMENT_WBACKSUB {
     ch_versions = ch_versions.mix(SOPA_SEGMENT.out.versions.first())
 
     emit:
-    annotations = SOPA_SEGMENT.out.annotations // channel: [ val(meta), *.geojson ]
+    annotations          = SOPA_SEGMENT.out.annotations          // channel: [ val(meta), *.geojson ]
+    kronos_embeddings    = SOPA_SEGMENT.out.kronos_embeddings    // channel: [ val(meta), *.csv ] OPTIONAL
+    kronos_marker_report = SOPA_SEGMENT.out.kronos_marker_report // channel: [ val(meta), *.txt ] OPTIONAL
 
     versions = ch_versions                     // channel: [ versions.yml ]
 }

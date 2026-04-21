@@ -21,8 +21,8 @@ nextflow_workflow {
                 input[0] = Channel.of([
                     [ id: 'test' ],
                     file('${projectDir}/tests/data/comet/synthetic_bgsub.ome.tif'), // tiff
-                    ["DAPI"], // nuclear channel
-                    ["CD45"]  // membrane channels
+                    "DAPI", // nuclear channel
+                    "CD45"  // membrane channels
                 ])
                 input[1] = 'whole-cell'
                 """
@@ -45,8 +45,8 @@ nextflow_workflow {
                 input[0] = Channel.of([
                     [ id: 'test' ],
                     file('${projectDir}/tests/data/comet/synthetic_bgsub.ome.tif'), // tiff
-                    ["DAPI"], // nuclear channel
-                    [""]  // membrane channels
+                    "DAPI", // nuclear channel
+                    ""      // membrane channels
                 ])
                 input[1] = 'nuclear'
                 """

@@ -68,7 +68,6 @@ workflow PIPELINE_INITIALISATION {
     //
     Channel
         .fromList(samplesheetToList(params.input, "${projectDir}/assets/schema_input.json"))
-        .groupTuple()
         .map { samplesheet ->
             validateInputSamplesheet(samplesheet)
         }

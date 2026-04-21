@@ -1,11 +1,10 @@
 channels:
   - conda-forge
   - bioconda
-  - defaults
 dependencies:
-  - conda-forge::r-tidyverse=2.0.0
-  - conda-forge::r-quarto=1.4.4
-  - conda-forge::r-magick=2.8.5
-  - conda-forge::r-devtools=2.4.5
-  - bioconda::bioconductor-spatialexperiment=1.16.0
-  - bioconda::bioconductor-spasim=1.8.0
+  - r-tidyverse =2.0.0
+  - r-quarto =1.4.4
+  - r-magick =2.8.5
+  - r-devtools =2.4.5
+  - bioconductor-spatialexperiment =1.16.0
+  - bioconductor-spasim =1.8.0

@@ -1,2 +1,2 @@
-sample,run_backsub,run_cellpose,run_mesmer,tiff,nuclear_channel,membrane_channels
-SAMPLE,boolean,boolean,boolean,/path/to/image.tif,nuclear_channel,membrane_channel1:membrane_channel2
+sample,run_backsub,run_cellpose,run_mesmer,run_cellsam,tiff,nuclear_channel,membrane_channels
+SAMPLE,boolean,boolean,boolean,boolean,/path/to/image.tif,nuclear_channel,membrane_channel1:membrane_channel2

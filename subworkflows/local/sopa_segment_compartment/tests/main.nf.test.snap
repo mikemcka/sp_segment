@@ -10,16 +10,16 @@
                         [
                             [
                                 [
-                                    "0.parquet:md5,fe0e3b2caa7ed2820ac40d13a689d2bf"
+                                    "0.parquet:md5,f2e1a6f0d6f5a6d5b8d6f946a5202a8b"
                                 ],
                                 "patches_file_image:md5,b026324c6904b2a9cb4b88d6d61c81d1"
                             ],
-                            ".zattrs:md5,f73562e0c37fb0115b37794a1a74974b",
+                            ".zattrs:md5,5b1624cbfb8945c68cb2c81560b6c34a",
                             ".zgroup:md5,e20297935e73dd0154104d4ea53040ab",
                             [
                                 ".zgroup:md5,e20297935e73dd0154104d4ea53040ab",
                                 [
-                                    ".zattrs:md5,88568da6903af9fe0e018987dc08cae8",
+                                    ".zattrs:md5,6eb7f30f2fd06c5545b10ef449c4dfe2",
                                     ".zgroup:md5,e20297935e73dd0154104d4ea53040ab",
                                     [
                                         ".zarray:md5,693c1a6da0b95db2dcbeef6cdd71799b",
@@ -116,17 +116,17 @@
                             [
                                 ".zgroup:md5,e20297935e73dd0154104d4ea53040ab",
                                 [
-                                    ".zattrs:md5,3092d7fd5d51b39416853b3c74211344",
+                                    ".zattrs:md5,37c0eabf77e69009a9f0c878e69ea262",
                                     ".zgroup:md5,e20297935e73dd0154104d4ea53040ab",
-                                    "shapes.parquet:md5,84f1a2c0e1b5cf1decf5a26981cce8b0"
+                                    "shapes.parquet:md5,c82107ed58752c8ae5346e915a598d9d"
                                 ],
                                 [
-                                    ".zattrs:md5,3092d7fd5d51b39416853b3c74211344",
+                                    ".zattrs:md5,37c0eabf77e69009a9f0c878e69ea262",
                                     ".zgroup:md5,e20297935e73dd0154104d4ea53040ab",
-                                    "shapes.parquet:md5,1d72741f51032c25f60816665ba7506b"
+                                    "shapes.parquet:md5,3b93467199715b849ed467bd3030b386"
                                 ]
                             ],
-                            "zmetadata:md5,a3a0a0335a8f02b5aeb807496769d4dd"
+                            "zmetadata:md5,de568dce6924e52a7c25150fb5768b33"
                         ]
                     ]
                 ],
@@ -135,28 +135,28 @@
                         {
                             "id": "test"
                         },
-                        "test_whole-cell.tiff:md5,c8155cf7bee85dfb06fb79464527f5c2"
+                        "test_whole-cell.tiff:md5,4995049df4d54917689d30c20f657662"
                     ]
                 ],
                 "2": [
-                    "versions.yml:md5,01a97cc0d6583405a75efc4c6fccc71d",
-                    "versions.yml:md5,17192ede14c4118bed93c5ce081b5bb9",
-                    "versions.yml:md5,269475eaff9a1fbca3d7f0e3e35ebc39",
-                    "versions.yml:md5,49a1720f2a84a49cdc275753a0520d9b"
+                    "versions.yml:md5,49a1720f2a84a49cdc275753a0520d9b",
+                    "versions.yml:md5,6a3b91ba67e84aeb9eb9c3965363c5ac",
+                    "versions.yml:md5,886b81c4ac10fcf574bb5842a7088304",
+                    "versions.yml:md5,9d57548309c95ae9e205acde40c4fc09"
                 ],
                 "tiff": [
                     [
                         {
                             "id": "test"
                         },
-                        "test_whole-cell.tiff:md5,c8155cf7bee85dfb06fb79464527f5c2"
+                        "test_whole-cell.tiff:md5,4995049df4d54917689d30c20f657662"
                     ]
                 ],
                 "versions": [
-                    "versions.yml:md5,01a97cc0d6583405a75efc4c6fccc71d",
-                    "versions.yml:md5,17192ede14c4118bed93c5ce081b5bb9",
-                    "versions.yml:md5,269475eaff9a1fbca3d7f0e3e35ebc39",
-                    "versions.yml:md5,49a1720f2a84a49cdc275753a0520d9b"
+                    "versions.yml:md5,49a1720f2a84a49cdc275753a0520d9b",
+                    "versions.yml:md5,6a3b91ba67e84aeb9eb9c3965363c5ac",
+                    "versions.yml:md5,886b81c4ac10fcf574bb5842a7088304",
+                    "versions.yml:md5,9d57548309c95ae9e205acde40c4fc09"
                 ],
                 "zarr": [
                     [
@@ -166,16 +166,16 @@
                         [
                             [
                                 [
-                                    "0.parquet:md5,fe0e3b2caa7ed2820ac40d13a689d2bf"
+                                    "0.parquet:md5,f2e1a6f0d6f5a6d5b8d6f946a5202a8b"
                                 ],
                                 "patches_file_image:md5,b026324c6904b2a9cb4b88d6d61c81d1"
                             ],
-                            ".zattrs:md5,f73562e0c37fb0115b37794a1a74974b",
+                            ".zattrs:md5,5b1624cbfb8945c68cb2c81560b6c34a",
                             ".zgroup:md5,e20297935e73dd0154104d4ea53040ab",
                             [
                                 ".zgroup:md5,e20297935e73dd0154104d4ea53040ab",
                                 [
-                                    ".zattrs:md5,88568da6903af9fe0e018987dc08cae8",
+                                    ".zattrs:md5,6eb7f30f2fd06c5545b10ef449c4dfe2",
                                     ".zgroup:md5,e20297935e73dd0154104d4ea53040ab",
                                     [
                                         ".zarray:md5,693c1a6da0b95db2dcbeef6cdd71799b",
@@ -272,17 +272,17 @@
                             [
                                 ".zgroup:md5,e20297935e73dd0154104d4ea53040ab",
                                 [
-                                    ".zattrs:md5,3092d7fd5d51b39416853b3c74211344",
+                                    ".zattrs:md5,37c0eabf77e69009a9f0c878e69ea262",
                                     ".zgroup:md5,e20297935e73dd0154104d4ea53040ab",
-                                    "shapes.parquet:md5,84f1a2c0e1b5cf1decf5a26981cce8b0"
+                                    "shapes.parquet:md5,c82107ed58752c8ae5346e915a598d9d"
                                 ],
                                 [
-                                    ".zattrs:md5,3092d7fd5d51b39416853b3c74211344",
+                                    ".zattrs:md5,37c0eabf77e69009a9f0c878e69ea262",
                                     ".zgroup:md5,e20297935e73dd0154104d4ea53040ab",
-                                    "shapes.parquet:md5,1d72741f51032c25f60816665ba7506b"
+                                    "shapes.parquet:md5,3b93467199715b849ed467bd3030b386"
                                 ]
                             ],
-                            "zmetadata:md5,a3a0a0335a8f02b5aeb807496769d4dd"
+                            "zmetadata:md5,de568dce6924e52a7c25150fb5768b33"
                         ]
                     ]
                 ]
@@ -292,7 +292,7 @@
             "nf-test": "0.9.2",
             "nextflow": "25.04.4"
         },
-        "timestamp": "2025-08-06T15:39:47.9431831"
+        "timestamp": "2026-04-20T15:01:01.49068654"
     },
     "sopa_segment - tiff - whole-cell": {
         "content": [
@@ -594,16 +594,16 @@
                         [
                             [
                                 [
-                                    "0.parquet:md5,aa55089035ebbba207f14c64e4bff40c"
+                                    "0.parquet:md5,61c904c0f59f03be6036b39a7f5446a7"
                                 ],
                                 "patches_file_image:md5,b026324c6904b2a9cb4b88d6d61c81d1"
                             ],
-                            ".zattrs:md5,f73562e0c37fb0115b37794a1a74974b",
+                            ".zattrs:md5,5b1624cbfb8945c68cb2c81560b6c34a",
                             ".zgroup:md5,e20297935e73dd0154104d4ea53040ab",
                             [
                                 ".zgroup:md5,e20297935e73dd0154104d4ea53040ab",
                                 [
-                                    ".zattrs:md5,88568da6903af9fe0e018987dc08cae8",
+                                    ".zattrs:md5,6eb7f30f2fd06c5545b10ef449c4dfe2",
                                     ".zgroup:md5,e20297935e73dd0154104d4ea53040ab",
                                     [
                                         ".zarray:md5,693c1a6da0b95db2dcbeef6cdd71799b",
@@ -700,17 +700,17 @@
                             [
                                 ".zgroup:md5,e20297935e73dd0154104d4ea53040ab",
                                 [
-                                    ".zattrs:md5,3092d7fd5d51b39416853b3c74211344",
+                                    ".zattrs:md5,37c0eabf77e69009a9f0c878e69ea262",
                                     ".zgroup:md5,e20297935e73dd0154104d4ea53040ab",
-                                    "shapes.parquet:md5,cb014415362e15ece5abcf40259e96c5"
+                                    "shapes.parquet:md5,421068b309f947d377a39796ab75c048"
                                 ],
                                 [
-                                    ".zattrs:md5,3092d7fd5d51b39416853b3c74211344",
+                                    ".zattrs:md5,37c0eabf77e69009a9f0c878e69ea262",
                                     ".zgroup:md5,e20297935e73dd0154104d4ea53040ab",
-                                    "shapes.parquet:md5,1d72741f51032c25f60816665ba7506b"
+                                    "shapes.parquet:md5,3b93467199715b849ed467bd3030b386"
                                 ]
                             ],
-                            "zmetadata:md5,a3a0a0335a8f02b5aeb807496769d4dd"
+                            "zmetadata:md5,de568dce6924e52a7c25150fb5768b33"
                         ]
                     ]
                 ],
@@ -719,28 +719,28 @@
                         {
                             "id": "test"
                         },
-                        "test_nuclear.tiff:md5,40a6f63731e25edbb90902dd905b0234"
+                        "test_nuclear.tiff:md5,0dd293dea680c886f43a3207291aedf3"
                     ]
                 ],
                 "2": [
-                    "versions.yml:md5,01a97cc0d6583405a75efc4c6fccc71d",
-                    "versions.yml:md5,17192ede14c4118bed93c5ce081b5bb9",
-                    "versions.yml:md5,269475eaff9a1fbca3d7f0e3e35ebc39",
-                    "versions.yml:md5,49a1720f2a84a49cdc275753a0520d9b"
+                    "versions.yml:md5,49a1720f2a84a49cdc275753a0520d9b",
+                    "versions.yml:md5,6a3b91ba67e84aeb9eb9c3965363c5ac",
+                    "versions.yml:md5,886b81c4ac10fcf574bb5842a7088304",
+                    "versions.yml:md5,9d57548309c95ae9e205acde40c4fc09"
                 ],
                 "tiff": [
                     [
                         {
                             "id": "test"
                         },
-                        "test_nuclear.tiff:md5,40a6f63731e25edbb90902dd905b0234"
+                        "test_nuclear.tiff:md5,0dd293dea680c886f43a3207291aedf3"
                     ]
                 ],
                 "versions": [
-                    "versions.yml:md5,01a97cc0d6583405a75efc4c6fccc71d",
-                    "versions.yml:md5,17192ede14c4118bed93c5ce081b5bb9",
-                    "versions.yml:md5,269475eaff9a1fbca3d7f0e3e35ebc39",
-                    "versions.yml:md5,49a1720f2a84a49cdc275753a0520d9b"
+                    "versions.yml:md5,49a1720f2a84a49cdc275753a0520d9b",
+                    "versions.yml:md5,6a3b91ba67e84aeb9eb9c3965363c5ac",
+                    "versions.yml:md5,886b81c4ac10fcf574bb5842a7088304",
+                    "versions.yml:md5,9d57548309c95ae9e205acde40c4fc09"
                 ],
                 "zarr": [
                     [
@@ -750,16 +750,16 @@
                         [
                             [
                                 [
-                                    "0.parquet:md5,aa55089035ebbba207f14c64e4bff40c"
+                                    "0.parquet:md5,61c904c0f59f03be6036b39a7f5446a7"
                                 ],
                                 "patches_file_image:md5,b026324c6904b2a9cb4b88d6d61c81d1"
                             ],
-                            ".zattrs:md5,f73562e0c37fb0115b37794a1a74974b",
+                            ".zattrs:md5,5b1624cbfb8945c68cb2c81560b6c34a",
                             ".zgroup:md5,e20297935e73dd0154104d4ea53040ab",
                             [
                                 ".zgroup:md5,e20297935e73dd0154104d4ea53040ab",
                                 [
-                                    ".zattrs:md5,88568da6903af9fe0e018987dc08cae8",
+                                    ".zattrs:md5,6eb7f30f2fd06c5545b10ef449c4dfe2",
                                     ".zgroup:md5,e20297935e73dd0154104d4ea53040ab",
                                     [
                                         ".zarray:md5,693c1a6da0b95db2dcbeef6cdd71799b",
@@ -856,17 +856,17 @@
                             [
                                 ".zgroup:md5,e20297935e73dd0154104d4ea53040ab",
                                 [
-                                    ".zattrs:md5,3092d7fd5d51b39416853b3c74211344",
+                                    ".zattrs:md5,37c0eabf77e69009a9f0c878e69ea262",
                                     ".zgroup:md5,e20297935e73dd0154104d4ea53040ab",
-                                    "shapes.parquet:md5,cb014415362e15ece5abcf40259e96c5"
+                                    "shapes.parquet:md5,421068b309f947d377a39796ab75c048"
                                 ],
                                 [
-                                    ".zattrs:md5,3092d7fd5d51b39416853b3c74211344",
+                                    ".zattrs:md5,37c0eabf77e69009a9f0c878e69ea262",
                                     ".zgroup:md5,e20297935e73dd0154104d4ea53040ab",
-                                    "shapes.parquet:md5,1d72741f51032c25f60816665ba7506b"
+                                    "shapes.parquet:md5,3b93467199715b849ed467bd3030b386"
                                 ]
                             ],
-                            "zmetadata:md5,a3a0a0335a8f02b5aeb807496769d4dd"
+                            "zmetadata:md5,de568dce6924e52a7c25150fb5768b33"
                         ]
                     ]
                 ]
@@ -876,7 +876,7 @@
             "nf-test": "0.9.2",
             "nextflow": "25.04.4"
         },
-        "timestamp": "2025-08-06T15:41:36.75390001"
+        "timestamp": "2026-04-20T15:07:22.555730691"
     },
     "sopa_segment - tiff - nuclear": {
         "content": [

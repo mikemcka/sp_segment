@@ -129,7 +129,7 @@
             "nf-test": "0.9.2",
             "nextflow": "25.04.4"
         },
-        "timestamp": "2025-10-13T21:02:54.215459178"
+        "timestamp": "2026-04-14T16:00:48.093136127"
     },
     "combinechannels - non-OME tiff": {
         "content": [
@@ -139,7 +139,7 @@
                         {
                             "id": "test"
                         },
-                        "test_combined_channels.tiff:md5,5eb9d84a3be5f4cc1910a0ea85f81b44"
+                        "test_combined_channels.tiff:md5,7734d492417215aea586b07c0e79dc05"
                     ]
                 ],
                 "1": [
@@ -150,7 +150,7 @@
                         {
                             "id": "test"
                         },
-                        "test_combined_channels.tiff:md5,5eb9d84a3be5f4cc1910a0ea85f81b44"
+                        "test_combined_channels.tiff:md5,7734d492417215aea586b07c0e79dc05"
                     ]
                 ],
                 "versions": [
@@ -162,6 +162,6 @@
             "nf-test": "0.9.2",
             "nextflow": "25.04.4"
         },
-        "timestamp": "2025-10-13T21:03:20.737768611"
+        "timestamp": "2026-04-14T16:01:14.442763976"
     }
 }

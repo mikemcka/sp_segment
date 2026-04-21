@@ -1,0 +1,75 @@
+nextflow_process {
+
+    name 'Test KRONOSEMBEDDINGS'
+    script '../main.nf'
+    process 'KRONOSEMBEDDINGS'
+    tag "modules"
+    tag "modules_local"
+    tag "kronosembeddings"
+
+    test("KRONOSEMBEDDINGS - stub") {
+
+        options "-stub"
+
+        when {
+            process {
+                """
+                input[0] = [
+                    [ id:'test' ],
+                    file('${projectDir}/tests/data/mesmer/test_data.tiff', checkIfExists: true),
+                    file('${projectDir}/tests/data/mesmer/test_data_whole-cell.tiff', checkIfExists: true)
+                ]
+                input[1] = file('${projectDir}/tests/data/mesmer', checkIfExists: true)  // kronos_model_path (dummy value)
+                input[2] = file('${projectDir}/tests/kronos_marker_metadata.csv', checkIfExists: true)
+                input[3] = [
+                    [ id:'test' ],
+                    file('${projectDir}/tests/data/mesmer/test_data_segmentation.geojson', checkIfExists: true)
+                ]
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert process.success },
+                { assert process.out.embeddings },
+                { assert process.out.marker_report },
+                { assert process.out.merged_geojson },
+                { assert process.out.versions }
+            )
+        }
+    }
+
+    def kronosModelDir = System.getenv("KRONOS_MODEL_DIR")
+    if (kronosModelDir) {
+        test("KRONOSEMBEDDINGS - integration (model required)") {
+            when {
+                process {
+                    """
+                    input[0] = [
+                        [ id:'test_integration' ],
+                        file('${projectDir}/tests/data/mesmer/test_data.tiff', checkIfExists: true),
+                        file('${projectDir}/tests/data/mesmer/test_data_whole-cell.tiff', checkIfExists: true)
+                    ]
+                    input[1] = file(kronosModelDir, checkIfExists: true)
+                    input[2] = file('${projectDir}/tests/kronos_marker_metadata.csv', checkIfExists: true)
+                    input[3] = [
+                        [ id:'test_integration' ],
+                        file('${projectDir}/tests/data/mesmer/test_data_segmentation.geojson', checkIfExists: true)
+                    ]
+                    """
+                }
+            }
+
+            then {
+                assertAll(
+                    { assert process.success },
+                    { assert process.out.embeddings },
+                    { assert process.out.marker_report },
+                    { assert process.out.merged_geojson },
+                    { assert process.out.versions }
+                )
+            }
+        }
+    }
+}

@@ -1,0 +1,142 @@
+{
+    "cellsam_segment - tiff": {
+        "content": [
+            {
+                "0": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "test_nuclear.tiff:md5,e3c87a0e3c3f35ab4844a2bd9524735d"
+                    ]
+                ],
+                "1": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "test_whole-cell.tiff:md5,997f6f3bb252768f5f23fec9bda790a9"
+                    ]
+                ],
+                "2": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "test.geojson:md5,d1dfc87df95d414d4333a8959a9a5c1e"
+                    ]
+                ],
+                "3": [
+                    
+                ],
+                "4": [
+                    
+                ],
+                "5": [
+                    
+                ],
+                "6": [
+                    "versions.yml:md5,3bf60019488b73b2726b5ce986b4c9a8",
+                    "versions.yml:md5,4f669920aa5b17de77e4f8e6cd72699b",
+                    "versions.yml:md5,92f71ebcee8f47a19acafaf3fbd54b0b"
+                ],
+                "annotations": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "test.geojson:md5,d1dfc87df95d414d4333a8959a9a5c1e"
+                    ]
+                ],
+                "kronos_embeddings": [
+                    
+                ],
+                "kronos_marker_report": [
+                    
+                ],
+                "nuclear_segmentation_mask": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "test_nuclear.tiff:md5,e3c87a0e3c3f35ab4844a2bd9524735d"
+                    ]
+                ],
+                "report": [
+                    
+                ],
+                "versions": [
+                    "versions.yml:md5,3bf60019488b73b2726b5ce986b4c9a8",
+                    "versions.yml:md5,4f669920aa5b17de77e4f8e6cd72699b",
+                    "versions.yml:md5,92f71ebcee8f47a19acafaf3fbd54b0b"
+                ],
+                "wholecell_segmentation_mask": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "test_whole-cell.tiff:md5,997f6f3bb252768f5f23fec9bda790a9"
+                    ]
+                ]
+            }
+        ],
+        "meta": {
+            "nf-test": "0.9.2",
+            "nextflow": "25.04.4"
+        },
+        "timestamp": "2026-04-20T14:42:39.983078971"
+    },
+    "cellsam_segment - with background subtraction": {
+        "content": [
+            {
+                "0": [
+                    
+                ],
+                "1": [
+                    
+                ],
+                "2": [
+                    
+                ],
+                "3": [
+                    
+                ],
+                "4": [
+                    
+                ],
+                "5": [
+                    
+                ],
+                "6": [
+                    
+                ],
+                "annotations": [
+                    
+                ],
+                "kronos_embeddings": [
+                    
+                ],
+                "kronos_marker_report": [
+                    
+                ],
+                "nuclear_segmentation_mask": [
+                    
+                ],
+                "report": [
+                    
+                ],
+                "versions": [
+                    
+                ],
+                "wholecell_segmentation_mask": [
+                    
+                ]
+            }
+        ],
+        "meta": {
+            "nf-test": "0.9.2",
+            "nextflow": "25.04.4"
+        },
+        "timestamp": "2026-04-14T15:24:27.825330629"
+    }
+}

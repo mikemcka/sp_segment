@@ -16,7 +16,7 @@ workflow SOPA_SEGMENT_COMPARTMENT {
 
     main:
 
-    ch_versions = Channel.empty()
+    ch_versions = channel.empty()
 
     ch_sopa.map {
         meta,
@@ -52,7 +52,7 @@ workflow SOPA_SEGMENT_COMPARTMENT {
             (0..<n_patches).collect { index -> [ meta, zarr, index, n_patches ] } }
         .combine(ch_sopa, by: 0)
         .map { meta, zarr, index, n_patches, _tiff, nuclear_channel, membrane_channels ->
-            [ meta, zarr, index, n_patches, nuclear_channel.first(), membrane_channels.first() ]
+            [ meta, zarr, index, n_patches, nuclear_channel, membrane_channels ]
         }.set { ch_cellpose }
 
     //

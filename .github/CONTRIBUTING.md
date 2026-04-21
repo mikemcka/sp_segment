@@ -30,6 +30,13 @@ nf-test test --profile debug,test_mesmer,docker --verbose
 nf-test test --profile debug,test_cellpose,docker --verbose
 ```
 
+KRONOS module tests run in stub mode by default to avoid downloading large model checkpoints. To run the KRONOS integration module test, set a pre-downloaded model directory (must contain a `.pt` checkpoint) and run:
+
+```bash
+export KRONOS_MODEL_DIR=/path/to/kronos_model_dir
+nf-test test modules/local/kronosembeddings/tests/main.nf.test --profile debug,test,apptainer --verbose
+```
+
 When you create a pull request with changes, [GitHub Actions](https://github.com/features/actions) will run automatic tests.
 Typically, pull-requests are only fully reviewed when these tests are passing, though of course we can help out before then.
 

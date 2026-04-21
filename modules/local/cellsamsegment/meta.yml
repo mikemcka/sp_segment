@@ -1,0 +1,62 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/nf-core/modules/master/modules/meta-schema.json
+name: CELLSAMSEGMENT
+description: |
+  Performs cell segmentation on imaging data using CellSAM.
+  Handles multiplexed imaging data from COMET and MIBI platforms.
+  Uses segment anything model (SAM) for foundation model-based segmentation.
+keywords:
+  - cell segmentation
+  - spatial biology
+  - cellsam
+  - foundation model
+  - SAM
+tools:
+  - cellsam:
+      description: A foundation model for cell segmentation across imaging modalities
+      homepage: https://github.com/vanvalenlab/cellSAM
+      documentation: https://cellsam.readthedocs.io/
+      tool_dev_url: https://github.com/vanvalenlab/cellSAM
+      licence: ["Apache-2.0"]
+
+input:
+  - meta:
+      type: map
+      description: |
+        Groovy Map containing sample information
+        e.g. [ id:'test' ]
+  - tiff:
+      type: file
+      description: Input TIFF image file for segmentation
+      pattern: "*.{tiff,tif}"
+  - nuclear_channel:
+      type: string
+      description: Name of the nuclear channel
+  - membrane_channels:
+      type: string
+      description: Colon-separated list of membrane channel names
+  - compartment:
+      type: string
+      description: Compartment to segment (nuclear or whole-cell)
+      pattern: "{nuclear,whole-cell}"
+
+output:
+  - meta:
+      type: map
+      description: |
+        Groovy Map containing sample information
+        e.g. [ id:'test' ]
+  - segmentation_mask:
+      type: file
+      description: Output segmentation mask in TIFF format
+      pattern: "*.tiff"
+  - versions:
+      type: file
+      description: File containing software versions
+      pattern: "versions.yml"
+
+authors:
+  - "@mikemcka"
+maintainers:
+  - "@mikemcka"
+  - "@mcmero"

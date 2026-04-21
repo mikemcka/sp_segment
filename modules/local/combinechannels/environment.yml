@@ -3,7 +3,8 @@
 channels:
   - conda-forge
   - bioconda
-dependencies: -tifffile =2025.6.11
-  -xarray =2024.11.0
-  -numpy =1.26
-  -typer =0.16
+dependencies:
+  - tifffile =2025.6.11
+  - xarray =2024.11.0
+  - numpy =1.26
+  - typer =0.16

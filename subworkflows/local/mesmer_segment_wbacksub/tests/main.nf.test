@@ -27,9 +27,10 @@ nextflow_workflow {
                     true,  // run_backsub
                     true,  // run_mesmer
                     false, // run_cellpose
+                    false, // run_cellsam
                     file('${projectDir}/tests/data/comet/synthetic_multichannel.tif'), // tiff
-                    ["DAPI"], // nuclear channel
-                    ["CD45"]  // membrane channels
+                    "DAPI", // nuclear channel
+                    "CD45"  // membrane channels
                 ])
                 """
             }

@@ -28,6 +28,11 @@
                 "default": false,
                 "errorMessage": "Run cellpose must be a boolean"
             },
+            "run_cellsam": {
+                "type": "boolean",
+                "default": false,
+                "errorMessage": "Run cellsam must be a boolean"
+            },
             "tiff": {
                 "type": "string",
                 "format": "file-path",

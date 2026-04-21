@@ -7,22 +7,38 @@
                         {
                             "id": "test"
                         },
-                        "test.geojson:md5,e52ca142bf4b7912d4fe6a9b7f55176d"
+                        "test.geojson:md5,395ff21ce7977edb59c9bd5ad01303cc"
                     ]
                 ],
                 "1": [
-                    "versions.yml:md5,ab4268c8f209ade85669d28c925f6294"
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "test_mask.tiff:md5,3d35966c853418f42e9d34686816881c"
+                    ]
+                ],
+                "2": [
+                    "versions.yml:md5,4923934e707ca0a66ca0922258f6a967"
                 ],
                 "annotations": [
                     [
                         {
                             "id": "test"
                         },
-                        "test.geojson:md5,e52ca142bf4b7912d4fe6a9b7f55176d"
+                        "test.geojson:md5,395ff21ce7977edb59c9bd5ad01303cc"
+                    ]
+                ],
+                "masks": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "test_mask.tiff:md5,3d35966c853418f42e9d34686816881c"
                     ]
                 ],
                 "versions": [
-                    "versions.yml:md5,ab4268c8f209ade85669d28c925f6294"
+                    "versions.yml:md5,4923934e707ca0a66ca0922258f6a967"
                 ]
             }
         ],
@@ -30,7 +46,7 @@
             "nf-test": "0.9.2",
             "nextflow": "25.04.4"
         },
-        "timestamp": "2026-01-29T15:15:07.737161723"
+        "timestamp": "2026-04-14T14:14:31.505470318"
     },
     "cellmeasurement - with cell expansion and skip measurements": {
         "content": [
@@ -77,7 +93,15 @@
                     ]
                 ],
                 "1": [
-                    "versions.yml:md5,ab4268c8f209ade85669d28c925f6294"
+                    [
+                        {
+                            "id": "test_stub"
+                        },
+                        "test_stub_mask.tiff:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "2": [
+                    "versions.yml:md5,4923934e707ca0a66ca0922258f6a967"
                 ],
                 "annotations": [
                     [
@@ -87,8 +111,16 @@
                         "test_stub.geojson:md5,d41d8cd98f00b204e9800998ecf8427e"
                     ]
                 ],
+                "masks": [
+                    [
+                        {
+                            "id": "test_stub"
+                        },
+                        "test_stub_mask.tiff:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
                 "versions": [
-                    "versions.yml:md5,ab4268c8f209ade85669d28c925f6294"
+                    "versions.yml:md5,4923934e707ca0a66ca0922258f6a967"
                 ]
             }
         ],
@@ -96,7 +128,7 @@
             "nf-test": "0.9.2",
             "nextflow": "25.04.4"
         },
-        "timestamp": "2026-01-29T15:15:37.309104057"
+        "timestamp": "2026-04-14T14:15:02.876436754"
     },
     "cellmeasurement - skip measurements": {
         "content": [

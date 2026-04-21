@@ -2,6 +2,9 @@ include { COMBINECHANNELS                                    } from '../../../mo
 include { SOPA_SEGMENT_COMPARTMENT as SOPA_SEGMENT_NUCLEAR   } from '../sopa_segment_compartment/main.nf'
 include { SOPA_SEGMENT_COMPARTMENT as SOPA_SEGMENT_WHOLECELL } from '../sopa_segment_compartment/main.nf'
 include { CELLMEASUREMENT                                    } from '../../../modules/local/cellmeasurement/main.nf'
+include { SMOOTHMASKS as SMOOTHMASKS_NUC                     } from '../../../modules/local/smoothmasks/main.nf'
+include { SMOOTHMASKS as SMOOTHMASKS_WC                      } from '../../../modules/local/smoothmasks/main.nf'
+include { KRONOSEMBEDDINGS                                    } from '../../../modules/local/kronosembeddings/main.nf'
 include { SEGMENTATIONREPORT                                 } from '../../../modules/local/segmentationreport/main.nf'
 
 workflow SOPA_SEGMENT {
@@ -11,7 +14,7 @@ workflow SOPA_SEGMENT {
 
     main:
 
-    ch_versions = Channel.empty()
+    ch_versions = channel.empty()
 
     //
     // Combine membrane channels into a single channel
@@ -26,29 +29,31 @@ workflow SOPA_SEGMENT {
     COMBINECHANNELS.out.combined_tiff
         .join( ch_sopa, by: 0 )
         .map { meta, combined_tiff, _tiff, nuclear_channel, membrane_channels ->
-            def membrane_name = membrane_channels.first().split(':').size() == 1 ?
-                membrane_channels.first() : 'combined_membrane'
-            [ meta, combined_tiff, nuclear_channel, [membrane_name] ]
+            def membrane_name = membrane_channels.split(':').size() == 1 ?
+                membrane_channels : 'combined_membrane'
+            [ meta, combined_tiff, nuclear_channel, membrane_name ]
         }.set { ch_combined }
 
     //
-    // Run segmentation for nuclear compartment
+    // Run segmentation for nuclear compartment (skipped if skip_nuclear_mask)
     //
-    SOPA_SEGMENT_NUCLEAR(
-        ch_combined.map {
-            meta,
-            tiff,
-            nuclear_channel,
-            _membrane_channels -> [
+    if (!params.skip_nuclear_mask) {
+        SOPA_SEGMENT_NUCLEAR(
+            ch_combined.map {
                 meta,
                 tiff,
                 nuclear_channel,
-                [''] // no membrane channels for nuclear segmentation
-            ]
-        },
-        'nuclear'
-    )
-    ch_versions = ch_versions.mix(SOPA_SEGMENT_NUCLEAR.out.versions.first())
+                _membrane_channels -> [
+                    meta,
+                    tiff,
+                    nuclear_channel,
+                    '' // no membrane channels for nuclear segmentation
+                ]
+            },
+            'nuclear'
+        )
+        ch_versions = ch_versions.mix(SOPA_SEGMENT_NUCLEAR.out.versions.first())
+    }
 
     //
     // Run segmentation for whole-cell compartment
@@ -62,22 +67,74 @@ workflow SOPA_SEGMENT {
     //
     // Create a channel for cell measurement
     //
-    SOPA_SEGMENT_NUCLEAR.out.tiff
-        .join(SOPA_SEGMENT_WHOLECELL.out.tiff, by: 0)
-        .join(ch_sopa, by: 0)
-        .map {
-            meta,
-            nuclear_tiff,
-            wholecell_tiff,
-            tiff,
-            _nuc_chan,
-            _mem_chans -> [
+    if (params.skip_nuclear_mask) {
+        // When skipping nuclear mask, use the whole-cell mask as a placeholder for nuclear
+        // (cellmeasurement.py will ignore it due to --skip-nuclear-mask flag)
+        SOPA_SEGMENT_WHOLECELL.out.tiff
+            .join(ch_sopa, by: 0)
+            .map {
                 meta,
+                wholecell_tiff,
                 tiff,
+                _nuc_chan,
+                _mem_chans -> [
+                    meta,
+                    tiff,
+                    wholecell_tiff,  // placeholder for nuclear mask
+                    wholecell_tiff
+                ]
+            }.set { ch_cellmeasurement }
+    } else {
+        SOPA_SEGMENT_NUCLEAR.out.tiff
+            .join(SOPA_SEGMENT_WHOLECELL.out.tiff, by: 0)
+            .join(ch_sopa, by: 0)
+            .map {
+                meta,
                 nuclear_tiff,
-                wholecell_tiff
-            ]
-        }.set { ch_cellmeasurement }
+                wholecell_tiff,
+                tiff,
+                _nuc_chan,
+                _mem_chans -> [
+                    meta,
+                    tiff,
+                    nuclear_tiff,
+                    wholecell_tiff
+                ]
+            }.set { ch_cellmeasurement }
+    }
+
+    //
+    // Optional mask smoothing to reduce polygon complexity
+    //
+    if (params.smooth_masks) {
+        if (!params.skip_nuclear_mask) {
+            SMOOTHMASKS_NUC(
+                ch_cellmeasurement.map {
+                    meta, _tiff, nuclear_tiff, _wholecell_tiff -> [meta, nuclear_tiff]
+                }
+            )
+        }
+        SMOOTHMASKS_WC(
+            ch_cellmeasurement.map {
+                meta, _tiff, _nuclear_tiff, wholecell_tiff -> [meta, wholecell_tiff]
+            }
+        )
+        if (!params.skip_nuclear_mask) {
+            ch_cellmeasurement
+                .map { meta, tiff, _nuclear_tiff, _wholecell_tiff -> [meta, tiff] }
+                .join(SMOOTHMASKS_NUC.out.smoothed_mask)
+                .join(SMOOTHMASKS_WC.out.smoothed_mask)
+                .set { ch_cellmeasurement }
+            ch_versions = ch_versions.mix(SMOOTHMASKS_NUC.out.versions.first())
+        } else {
+            ch_cellmeasurement
+                .map { meta, tiff, _nuclear_tiff, _wholecell_tiff -> [meta, tiff] }
+                .join(SMOOTHMASKS_WC.out.smoothed_mask)
+                .map { meta, tiff, smoothed_wc -> [meta, tiff, smoothed_wc, smoothed_wc] }
+                .set { ch_cellmeasurement }
+        }
+        ch_versions = ch_versions.mix(SMOOTHMASKS_WC.out.versions.first())
+    }
 
     //
     // Run CELLMEASUREMENT module on the whole-cell and nuclear segmentation masks
@@ -87,11 +144,47 @@ workflow SOPA_SEGMENT {
     )
     ch_versions = ch_versions.mix(CELLMEASUREMENT.out.versions.first())
 
+    ch_annotations = CELLMEASUREMENT.out.annotations
+
+    //
+    // Optional KRONOS embedding extraction
+    //
+    ch_kronos_embeddings = channel.empty()
+    ch_kronos_marker_report = channel.empty()
+    if (!params.skip_kronos) {
+
+        // Create channel for KRONOS input: original tiff + whole-cell mask + geojson
+        ch_sopa
+            .join(SOPA_SEGMENT_WHOLECELL.out.tiff)
+            .map {
+                meta,
+                tiff,
+                _nuclear_channel,
+                _membrane_channels,
+                whole_cell_mask -> [
+                    meta,
+                    tiff,
+                    whole_cell_mask
+                ]
+            }.set { ch_kronos_input }
+
+        KRONOSEMBEDDINGS(
+            ch_kronos_input,
+            file(params.kronos_model_path),
+            file(params.kronos_marker_metadata),
+            CELLMEASUREMENT.out.annotations
+        )
+        ch_versions = ch_versions.mix(KRONOSEMBEDDINGS.out.versions.first())
+        ch_kronos_embeddings = KRONOSEMBEDDINGS.out.embeddings
+        ch_kronos_marker_report = KRONOSEMBEDDINGS.out.marker_report
+        ch_annotations = KRONOSEMBEDDINGS.out.merged_geojson
+    }
+
     // Optional SEGMENTATIONREPORT module
-    ch_report = Channel.empty()
+    ch_report = channel.empty()
     if (params.generate_report) {
         ch_combined
-            .join(CELLMEASUREMENT.out.annotations)
+            .join(ch_annotations)
             .map {
                 sample,
                 combined_tiff,
@@ -102,8 +195,8 @@ workflow SOPA_SEGMENT {
                     annotations,
                     false, // run_mesmer
                     true,  // run_cellpose
-                    nuclear_channel.first(),
-                    membrane_channels.first(),
+                    nuclear_channel,
+                    membrane_channels,
                     combined_tiff
                 ]
             }.set { ch_segmentationreport }
@@ -120,8 +213,10 @@ workflow SOPA_SEGMENT {
     }
 
     emit:
-    annotations = CELLMEASUREMENT.out.annotations   // channel: [ val(meta), *.geojson ]
-    report      = ch_report                         // channel: [ val(meta), *.html ] OPTIONAL
+    annotations          = ch_annotations                    // channel: [ val(meta), *.geojson ]
+    kronos_embeddings    = ch_kronos_embeddings              // channel: [ val(meta), *.csv ] OPTIONAL
+    kronos_marker_report = ch_kronos_marker_report           // channel: [ val(meta), *.txt ] OPTIONAL
+    report               = ch_report                         // channel: [ val(meta), *.html ] OPTIONAL
 
-    versions = ch_versions                          // channel: [ versions.yml ]
+    versions = ch_versions                                   // channel: [ versions.yml ]
 }

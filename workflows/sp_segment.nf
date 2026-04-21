@@ -5,14 +5,16 @@
 */
 
 
-include { paramsSummaryMap        } from 'plugin/nf-schema'
-include { BACKGROUNDSUBTRACT      } from '../subworkflows/local/backgroundsubtract'
-include { MESMER_SEGMENT_WBACKSUB } from '../subworkflows/local/mesmer_segment_wbacksub'
-include { MESMER_SEGMENT          } from '../subworkflows/local/mesmer_segment'
-include { SOPA_SEGMENT            } from '../subworkflows/local/sopa_segment'
-include { SOPA_SEGMENT_WBACKSUB   } from '../subworkflows/local/sopa_segment_wbacksub'
-include { softwareVersionsToYAML  } from '../subworkflows/nf-core/utils_nfcore_pipeline'
-include { methodsDescriptionText  } from '../subworkflows/local/utils_nfcore_sp_segment_pipeline'
+include { paramsSummaryMap          } from 'plugin/nf-schema'
+include { BACKGROUNDSUBTRACT        } from '../subworkflows/local/backgroundsubtract'
+include { MESMER_SEGMENT_WBACKSUB   } from '../subworkflows/local/mesmer_segment_wbacksub'
+include { MESMER_SEGMENT            } from '../subworkflows/local/mesmer_segment'
+include { CELLSAM_SEGMENT_WBACKSUB  } from '../subworkflows/local/cellsam_segment_wbacksub'
+include { CELLSAM_SEGMENT           } from '../subworkflows/local/cellsam_segment'
+include { SOPA_SEGMENT              } from '../subworkflows/local/sopa_segment'
+include { SOPA_SEGMENT_WBACKSUB     } from '../subworkflows/local/sopa_segment_wbacksub'
+include { softwareVersionsToYAML    } from '../subworkflows/nf-core/utils_nfcore_pipeline'
+include { methodsDescriptionText    } from '../subworkflows/local/utils_nfcore_sp_segment_pipeline'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -29,14 +31,15 @@ workflow SP_SEGMENT {
     ch_versions = Channel.empty()
 
     //
-    // Construct channel for background subtraction/segmentation workflow
+    // Construct channel for background subtraction/segmentation workflow for MESMER
     //
     ch_samplesheet.branch { it ->
-        backsub_only: it[1].contains(true) &&  // run_backsub true
-                        !it[2].contains(true) && // run_mesmer false
-                        !it[3].contains(true)    // run_cellpose false
-        backsub_mesmer: it[1].contains(true) && it[2].contains(true) // run_backsub true, run_mesmer true
-        mesmer_only: !it[1].contains(true) && it[2].contains(true) // run_backsub false, run_mesmer true
+        backsub_only: it[1] == true &&  // run_backsub true
+                        it[2] == false && // run_mesmer false
+                        it[3] == false && // run_cellpose false
+                        it[4] == false    // run_cellsam false
+        backsub_mesmer: it[1] == true && it[2] == true // run_backsub true, run_mesmer true
+        mesmer_only: it[1] == false && it[2] == true // run_backsub false, run_mesmer true
     }.set { ch_mesmer }
 
     //
@@ -49,6 +52,7 @@ workflow SP_SEGMENT {
             _run_backsub,
             _run_mesmer,
             _run_cellpose,
+            _run_cellsam,
             tiff,
             _nuclear_channel,
             _membrane_channels -> [
@@ -77,12 +81,13 @@ workflow SP_SEGMENT {
     // Construct channel for only CELLPOSE subworkflow
     //
     ch_samplesheet.filter {
-        it[3].contains(true) // run_cellpose true for sample
+        it[3] == true // run_cellpose true for sample
     }.map {
         sample,
         run_backsub,
         _run_mesmer,
         _run_cellpose,
+        _run_cellsam,
         tiff,
         nuclear_channel,
         membrane_channels -> [
@@ -93,8 +98,8 @@ workflow SP_SEGMENT {
             membrane_channels
         ]
     }.branch { it ->
-        with_backsub: it[1].contains(true)// run_backsub true
-        no_backsub: !it[1].contains(true) // run_backsub false
+        with_backsub: it[1] == true// run_backsub true
+        no_backsub: it[1] == false // run_backsub false
     }.set { ch_cellpose_samplesheet }
 
     //
@@ -121,6 +126,29 @@ workflow SP_SEGMENT {
             membrane_channels ->
             [ sample, tiff, nuclear_channel, membrane_channels ]
         }
+    )
+
+    //
+    // Construct channel for CellSAM segmentation workflow
+    //
+    ch_samplesheet.branch { it ->
+        backsub_cellsam: it[1] == true && it[4] == true // run_backsub true, run_cellsam true
+        cellsam_only: it[1] == false && it[4] == true   // run_backsub false, run_cellsam true
+    }.set { ch_cellsam }
+
+    //
+    // Run the CELLSAM_SEGMENT_WBACKSUB subworkflow for samples that require
+    // background subtraction and CellSAM segmentation
+    //
+    CELLSAM_SEGMENT_WBACKSUB(
+        ch_cellsam.backsub_cellsam
+    )
+
+    //
+    // Run CELLSAM_SEGMENT subworkflow for samples that ONLY require CellSAM segmentation
+    //
+    CELLSAM_SEGMENT(
+        ch_cellsam.cellsam_only
     )
 
     //

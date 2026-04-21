@@ -92,7 +92,6 @@ jobs:
       - name: "Run pipeline with test data ${{ matrix.NXF_VER }} | ${{ matrix.test_name }} | ${{ matrix.profile }}"
         run: |
           mkdir -p work && chmod 777 work
-          mkdir -p $HOME/.gradle && chmod 777 $HOME/.gradle
           if [ "${{ matrix.profile }}" == "singularity" ]; then
             export NXF_SINGULARITY_HOME_MOUNT=true
           fi

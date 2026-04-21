@@ -19,11 +19,12 @@ nextflow_workflow {
                 input[0] = Channel.of([
                     [ id: 'test' ],
                     false,  // run_backsub
-                    true,  // run_mesmer
-                    false, // run_cellpose
+                    true,   // run_mesmer
+                    false,  // run_cellpose
+                    false,  // run_cellsam
                     file("${projectDir}/tests/data/mesmer/test_data.tiff", checkIfExists: true), // tiff
-                    ["nuclear"],     // nuclear_channel
-                    ["membrane"] // membrane_channels
+                    "nuclear",     // nuclear_channel
+                    "membrane" // membrane_channels
                 ])
                 """
             }

@@ -22,8 +22,8 @@ nextflow_workflow {
                 input[0] = Channel.of([
                     [ id: 'test' ],
                     file('${projectDir}/tests/data/comet/synthetic_bgsub.ome.tif'), // tiff
-                    ["DAPI"], // nuclear channel
-                    ["CD45"]  // membrane channels
+                    "DAPI", // nuclear channel
+                    "CD45"  // membrane channels
                 ])
                 """
             }

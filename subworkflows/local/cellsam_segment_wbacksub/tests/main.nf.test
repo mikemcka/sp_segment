@@ -1,0 +1,45 @@
+nextflow_workflow {
+
+    name "Test Subworkflow CELLSAM_SEGMENT_WBACKSUB"
+    script "../main.nf"
+    workflow "CELLSAM_SEGMENT_WBACKSUB"
+
+    tag "subworkflows"
+    tag "subworkflows_local"
+    tag "subworkflows/cellsam_segment_wbacksub"
+    tag "backgroundsubtract"
+    tag "cellsam_segment"
+    tag "cellsamsegment"
+    tag "cellmeasurement"
+
+
+    test("cellsam_segment_wbacksub - tiff with background subtraction") {
+
+        when {
+            params {
+                remove_markers = 'TRITC'
+            }
+            workflow {
+                """
+                input[0] = Channel.of([
+                    [ id: 'test_wbacksub' ],
+                    true,   // run_backsub
+                    false,  // run_mesmer
+                    false,  // run_cellpose
+                    true,   // run_cellsam
+                    file("${projectDir}/tests/data/comet/synthetic_multichannel.tif", checkIfExists: true), // tiff
+                    "DAPI",     // nuclear_channel
+                    "CD45" // membrane_channels
+                ])
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert workflow.success},
+                { assert snapshot(workflow.out).match()}
+            )
+        }
+    }
+}

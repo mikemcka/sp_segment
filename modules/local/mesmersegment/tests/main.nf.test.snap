@@ -30,7 +30,7 @@
             "nf-test": "0.9.2",
             "nextflow": "25.04.4"
         },
-        "timestamp": "2025-08-25T14:09:16.068523077"
+        "timestamp": "2026-04-16T12:13:25.621357234"
     },
     "mesmersegment - cell segmentation": {
         "content": [
@@ -63,7 +63,7 @@
             "nf-test": "0.9.2",
             "nextflow": "25.04.4"
         },
-        "timestamp": "2025-08-25T14:10:03.566660924"
+        "timestamp": "2026-04-16T12:14:04.902946078"
     },
     "mesmersegment - stub": {
         "content": [
@@ -96,7 +96,7 @@
             "nf-test": "0.9.2",
             "nextflow": "25.04.4"
         },
-        "timestamp": "2025-08-25T14:10:31.742463009"
+        "timestamp": "2026-04-16T12:14:34.917255837"
     },
     "mesmersegment - minimal parameters": {
         "content": [

@@ -37,17 +37,69 @@ def main(
     """
     with TiffFile(tiff_path) as tiff:
         ome_metadata = tiff.ome_metadata
+        imagej_metadata = getattr(tiff, 'imagej_metadata', None)
 
-    root = ET.fromstring(ome_metadata)
-    ns = {'ome': 'http://www.openmicroscopy.org/Schemas/OME/2016-06'}
-
-    # Extract channel name and index
-    channels = root.findall('.//ome:Channel', ns)
     channel_meta = []
-    for ch in channels:
-        name = ch.attrib.get('Name')
-        channel_index = ch.attrib.get('ID')
-        channel_meta.append({'index': channel_index, 'marker_name': name})
+
+    if ome_metadata:
+        try:
+            root = ET.fromstring(ome_metadata)
+            ns = {'ome': 'http://www.openmicroscopy.org/Schemas/OME/2016-06'}
+
+            # Extract channel name and index
+            channels = root.findall('.//ome:Channel', ns)
+            for ch in channels:
+                name = ch.attrib.get('Name')
+                channel_index = ch.attrib.get('ID')
+                channel_meta.append({'index': channel_index, 'marker_name': name})
+
+            # Extract exposure times
+            planes = root.findall('.//ome:Plane', ns)
+            for pl in planes:
+                c_index = int(pl.attrib.get('TheC'))
+                exposure_time = pl.attrib.get('ExposureTime')
+                if exposure_time is not None:
+                    # planes are in channel order
+                    channel_meta[c_index]['exposure'] = float(exposure_time)
+
+            # Extract background channels
+            channel_privs = root.findall('.//ome:ChannelPriv', ns)
+            for idx, priv in enumerate(channel_privs):
+                channel_id = priv.attrib.get('ID')
+                for cm in channel_meta:
+                    if cm['index'] == channel_id:
+                        background = priv.attrib.get('FluorescenceChannel')
+                        if background == cm['marker_name']:
+                            channel_meta[idx]['background'] = ""
+                        else:
+                            channel_meta[idx]['background'] = background
+                        break
+        except ET.ParseError:
+            channel_meta = []
+
+    # Fallback for ImageJ metadata exports (no OME-XML)
+    if not channel_meta and isinstance(imagej_metadata, dict):
+        labels = imagej_metadata.get('Labels') or []
+        if labels:
+            channel_meta = [
+                {
+                    'index': str(i),
+                    'marker_name': str(name),
+                    'background': '',
+                    'exposure': 1.0,
+                }
+                for i, name in enumerate(labels)
+            ]
+            typer.echo(
+                "Warning: OME-XML metadata not found/invalid. "
+                "Using ImageJ channel labels with default exposure=1.0 and blank background.",
+                err=True
+            )
+
+    if not channel_meta:
+        raise ValueError(
+            "Could not extract channel metadata from OME-XML or ImageJ labels."
+        )
 
     # Validate remove channel list
     markers: List[str] = [cm['marker_name'] for cm in channel_meta]
@@ -57,30 +109,12 @@ def main(
                 f"Channel '{remove}' not found in the OME-TIFF metadata."
             )
 
-    # Extract exposure times
-    planes = root.findall('.//ome:Plane', ns)
-    for pl in planes:
-        c_index = int(pl.attrib.get('TheC'))
-        exposure_time = pl.attrib.get('ExposureTime')
-        # the planes are in the same order as the channels
-        # but channel ID is not the same as this index
-        channel_meta[c_index]['exposure'] = float(exposure_time)
-
-    # Extract background channels
-    channel_privs = root.findall('.//ome:ChannelPriv', ns)
-    for idx, priv in enumerate(channel_privs):
-        # just to be safe, let's make sure the ID is the same
-        # (but it should be in the same order)
-        channel_id = priv.attrib.get('ID')
-        for cm in channel_meta:
-            if cm['index'] == channel_id:
-                background = priv.attrib.get('FluorescenceChannel')
-                if background == cm['marker_name']:
-                    # make it blank (background same as marker)
-                    channel_meta[idx]['background'] = ""
-                else:
-                    channel_meta[idx]['background'] = background
-                break
+    # Ensure required fields exist in fallback mode
+    for cm in channel_meta:
+        if 'background' not in cm or cm['background'] is None:
+            cm['background'] = ''
+        if 'exposure' not in cm or cm['exposure'] is None:
+            cm['exposure'] = 1.0
 
     # Format output and write to stdout
     df = pd.DataFrame(channel_meta)
