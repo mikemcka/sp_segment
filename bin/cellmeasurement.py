@@ -218,47 +218,66 @@ def load_image(path: str) -> Tuple[np.ndarray, List[str]]:
     ch_names : list of str
         Human-readable channel names, length ``C``.
     """
-    img = tifffile.imread(path)
+    # Use the same loading strategy as cellsam_segment.py to ensure channel
+    # detection stays consistent across modules.  Iterating over ``tif.pages``
+    # explicitly avoids ``tifffile.imread`` collapsing a multi-page TIFF
+    # (e.g. an OPAL QPTIFF or BACKSUB output) into a single 2-D plane.
+    import json as _json
+
     ch_names: List[str] = []
 
     with tifffile.TiffFile(path) as tf:
-        # Strategy 1: OME-XML Channel/@Name (covers OME-TIFF, OPAL QPTIFF, COMET)
-        try:
-            import xml.etree.ElementTree as ET
+        first_page = tf.pages[0] if tf.pages else None
+        is_mibi = False
 
-            ome = tf.ome_metadata
-            # Fallback: OPAL QPTIFF stores OME-XML in first page ImageDescription
-            if not ome and tf.pages:
-                first_desc = tf.pages[0].description
-                if isinstance(first_desc, str) and first_desc.strip().startswith("<"):
-                    ome = first_desc
-            if ome:
-                root = ET.fromstring(ome)
-                ns = {"ome": "http://www.openmicroscopy.org/Schemas/OME/2016-06"}
-                channels = root.findall(".//ome:Channel", ns)
-                if channels:
-                    ch_names = [
-                        ch.get("Name") or ch.get("ID") or ""
-                        for ch in channels
-                    ]
-        except Exception as e:
-            print(f"Warning: failed to parse OME metadata for channel names ({e})")
-            ch_names = []
-
-        # Strategy 2: MIBI JSON metadata in per-page ImageDescription
-        if not ch_names:
+        # Detect MIBI-style per-page JSON metadata.
+        if first_page is not None:
             try:
-                import json as _json
-                first_desc = tf.pages[0].description if tf.pages else ""
-                _json.loads(first_desc)  # probe for JSON
-                ch_names = [
-                    str(_json.loads(p.description).get("channel.target", ""))
-                    for p in tf.pages
-                ]
-            except (ValueError, TypeError, KeyError, AttributeError):
+                first_desc = _json.loads(first_page.description)
+                is_mibi = "channel.target" in first_desc
+            except (ValueError, TypeError):
                 pass
 
-        # Strategy 3: ImageJ metadata Labels
+        if is_mibi:
+            pages = []
+            for page in tf.pages:
+                desc = _json.loads(page.description)
+                ch_names.append(str(desc.get("channel.target", "")))
+                pages.append(page.asarray())
+            img = np.stack(pages, axis=0)
+        elif len(tf.pages) > 1:
+            # Multi-page TIFF where each page is one channel (OME-TIFF, OPAL
+            # QPTIFF, COMET, BACKSUB output, etc.).
+            img = np.stack([page.asarray() for page in tf.pages], axis=0)
+        else:
+            # Single-page TIFF — could be (H, W) or interleaved (H, W, C).
+            img = tf.asarray()
+
+        # Strategy 1: OME-XML Channel/@Name (OME-TIFF, OPAL QPTIFF, COMET)
+        if not ch_names:
+            try:
+                import xml.etree.ElementTree as ET
+
+                ome = tf.ome_metadata
+                # OPAL QPTIFF stores OME-XML in first page ImageDescription
+                if not ome and first_page is not None:
+                    first_desc = first_page.description
+                    if isinstance(first_desc, str) and first_desc.strip().startswith("<"):
+                        ome = first_desc
+                if ome:
+                    root = ET.fromstring(ome)
+                    ns = {"ome": "http://www.openmicroscopy.org/Schemas/OME/2016-06"}
+                    channels = root.findall(".//ome:Channel", ns)
+                    if channels:
+                        ch_names = [
+                            ch.get("Name") or ch.get("ID") or ""
+                            for ch in channels
+                        ]
+            except Exception as e:
+                print(f"Warning: failed to parse OME metadata for channel names ({e})")
+                ch_names = []
+
+        # Strategy 2: ImageJ metadata Labels
         if not ch_names:
             try:
                 ij = tf.imagej_metadata
@@ -267,11 +286,6 @@ def load_image(path: str) -> Tuple[np.ndarray, List[str]]:
             except Exception:
                 pass
 
-        # Record the TIFF page count while we still have the file open.
-        # This is used below to disambiguate (C,H,W) vs (H,W,C) layout for
-        # 3D plain TIFFs without metadata: if page count == first dimension,
-        # the array is already (C,H,W); if page count == 1 and img is 3D,
-        # the TIFF was loaded as a single (H,W,C) interleaved frame.
         n_pages = len(tf.pages) if tf.pages else 0
 
     # --- Normalize image shape to (C, H, W) regardless of input layout ---
@@ -279,11 +293,8 @@ def load_image(path: str) -> Tuple[np.ndarray, List[str]]:
         # Single-channel greyscale: promote to (1, H, W)
         img = img[np.newaxis, ...]
     elif img.ndim == 3:
-        # Disambiguate (C, H, W) vs (H, W, C) using TIFF page count.
-        # If the number of pages matches the first dimension the array
-        # is already page-per-channel (C, H, W).
-        # If pages == 1, the single frame was loaded as (H, W, C).
-        # Fall back to the shape heuristic only when page count is ambiguous.
+        # If we stacked pages above, the array is already (C, H, W).
+        # Only single-page TIFFs can land here as interleaved (H, W, C).
         if n_pages > 1 and img.shape[0] == n_pages:
             pass  # already (C, H, W) — each page is one channel
         elif n_pages == 1 or (n_pages > 1 and img.shape[2] == n_pages):
