@@ -166,7 +166,7 @@ values separated by `:` characters. If your channels have spaces in them, make
 sure that you surround your channel name with quotes. For example, CD45:"HLA I".
 
 You can also set the segmentation parameters for mesmer either via CLI
-(e.g., `--combine_method prod` or in a config file pass to the workflow
+(e.g., `--combine_method max` or in a config file pass to the workflow
 via `-c`. See [usage](docs/usage.md) for a full list.
 
 > [!NOTE]
@@ -185,7 +185,7 @@ sample2,false,true,/path/to/sample2.tiff,DAPI,CD45
 
 As with Mesmer, nuclear channels only support one entry; membrane channels may
 have multiple values separated by `:` characters. You can also set the following
-parameters, either via CLI (e.g., `--combine_method prod` or in a config
+parameters, either via CLI (e.g., `--combine_method max` or in a config
 file pass to the workflow via `-c`. See [usage](docs/usage.md) for a full list.
 
 Cellpose will run in a parallelised patched workflow using sopa. To control the
@@ -193,7 +193,7 @@ patching process, you can use the `patch_width_pixel` and `patch_overlap_pixel`
 parameters.
 
 If you want to skip measurements (this may take some time for large images), you
-can use set the parameter `skip_measurements` to `true`.
+can use set the parameter `enable_measurements` to `false`.
 
 ### KRONOS embeddings
 
@@ -204,7 +204,7 @@ To enable KRONOS embeddings:
 ```bash
 nextflow run main.nf \
   --input samplesheet.csv \
-  --skip_kronos false \
+  --enable_kronos true \
   --kronos_model_path /path/to/kronos_model \
   --kronos_marker_metadata /path/to/marker_metadata.csv \
   --kronos_merge_geojson true \
@@ -213,7 +213,7 @@ nextflow run main.nf \
 
 #### KRONOS parameters
 
-- `--skip_kronos` (default: true): Set to `false` to enable KRONOS embedding extraction
+- `--enable_kronos` (default: false): Set to `true` to enable KRONOS embedding extraction
 - `--kronos_model_path` (required): Path to the KRONOS model checkpoint (.pt file)
 - `--kronos_config_path` (optional): Path to KRONOS `config.json` (auto-detected from model directory if not set)
 - `--kronos_marker_metadata` (required): Path to marker metadata CSV file mapping marker IDs to names

@@ -45,9 +45,9 @@ workflow MESMER_SEGMENT {
 
 
     //
-    // Run MESMERSEGMENT module for nuclear segmentation (skipped if skip_nuclear_mask)
+    // Run MESMERSEGMENT module for nuclear segmentation (skipped if use_whole_cell_only is true)
     //
-    if (!params.skip_nuclear_mask) {
+    if (!params.use_whole_cell_only) {
         MESMERNUC(
             ch_mesmer,
             "nuclear"
@@ -56,9 +56,9 @@ workflow MESMER_SEGMENT {
     }
 
     // Create channel for CELLMEASUREMENT input adding the segmentation masks
-    if (params.skip_nuclear_mask) {
+    if (params.use_whole_cell_only) {
         // When skipping nuclear mask, use the whole-cell mask as a placeholder for nuclear
-        // (cellmeasurement.py will ignore it due to --skip-nuclear-mask flag)
+        // (cellmeasurement.py will ignore it due to --use-whole-cell-only flag)
         ch_mesmer_segment
             .join(MESMERWC.out.segmentation_mask)
             .map {
@@ -104,7 +104,7 @@ workflow MESMER_SEGMENT {
     // Optional mask smoothing to reduce polygon complexity
     //
     if (params.smooth_masks) {
-        if (!params.skip_nuclear_mask) {
+        if (!params.use_whole_cell_only) {
             SMOOTHMASKS_NUC(
                 ch_cellmeasurement.map {
                     sample, _tiff, nuclear_mask, _whole_cell_mask -> [sample, nuclear_mask]
@@ -116,7 +116,7 @@ workflow MESMER_SEGMENT {
                 sample, _tiff, _nuclear_mask, whole_cell_mask -> [sample, whole_cell_mask]
             }
         )
-        if (!params.skip_nuclear_mask) {
+        if (!params.use_whole_cell_only) {
             ch_cellmeasurement
                 .map { sample, tiff, _nuclear_mask, _whole_cell_mask -> [sample, tiff] }
                 .join(SMOOTHMASKS_NUC.out.smoothed_mask)
@@ -148,7 +148,7 @@ workflow MESMER_SEGMENT {
     //
     ch_kronos_embeddings = channel.empty()
     ch_kronos_marker_report = channel.empty()
-    if (!params.skip_kronos) {
+    if (params.enable_kronos) {
 
         // Create channel for KRONOS input: tiff + whole-cell mask + geojson
         ch_mesmer_segment
@@ -231,7 +231,7 @@ workflow MESMER_SEGMENT {
     emit:
     annotations      = ch_annotations                  // channel: [ val(meta), *.geojson ]
     whole_cell_tif   = MESMERWC.out.segmentation_mask    // channel: [ val(meta), *.tiff ]
-    nuclear_tif      = params.skip_nuclear_mask ? channel.empty() : MESMERNUC.out.segmentation_mask   // channel: [ val(meta), *.tiff ]
+    nuclear_tif      = params.use_whole_cell_only ? channel.empty() : MESMERNUC.out.segmentation_mask   // channel: [ val(meta), *.tiff ]
     kronos_embeddings     = ch_kronos_embeddings          // channel: [ val(meta), *.csv ] OPTIONAL
     kronos_marker_report  = ch_kronos_marker_report       // channel: [ val(meta), *.txt ] OPTIONAL
     report           = ch_report                         // channel: [ val(meta), *.html ] OPTIONAL

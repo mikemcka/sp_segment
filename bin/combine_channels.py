@@ -369,7 +369,7 @@ def main(
     ],
     combine_method: Annotated[CombineMethod, typer.Option(
         help="Method to use for combining channels (prod or max).")
-    ] = CombineMethod.PROD,
+    ] = CombineMethod.MAX,
     pixel_size_microns: Annotated[Optional[float], typer.Option(
         help="Pixel size in microns. Written to OME-XML PhysicalSizeX/Y when "
              "the source image has no calibration metadata.")

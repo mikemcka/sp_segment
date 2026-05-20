@@ -27,8 +27,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   the KRONOS foundation model. Produces `*_kronos_embeddings.csv` (cell IDs + 384 embedding
   dimensions), `*_marker_report.txt` (channel-to-marker match summary), and optionally
   `*_kronos_merged.geojson` (embeddings merged into the cellmeasurement GeoJSON).
-  Controlled by `skip_kronos`, `kronos_model_path`, `kronos_marker_metadata`, and related
-  `kronos_*` parameters. Disabled by default (`skip_kronos = true`).
+  Controlled by `enable_kronos`, `kronos_model_path`, `kronos_marker_metadata`, and related
+  `kronos_*` parameters. Disabled by default (`enable_kronos = false`).
 
 - **CellSAM segmentation**: new `cellsam_segment` module adds support for the CellSAM foundation
   model as a third segmentation option alongside Mesmer and Cellpose. Supports tiled (WSI) and

@@ -44,9 +44,9 @@ workflow CELLSAM_SEGMENT {
 
 
     //
-    // Run CELLSAMSEGMENT module for nuclear segmentation (skipped if skip_nuclear_mask)
+    // Run CELLSAMSEGMENT module for nuclear segmentation (skipped if use_whole_cell_only is true)
     //
-    if (!params.skip_nuclear_mask) {
+    if (!params.use_whole_cell_only) {
         CELLSAMNUC(
             ch_cellsam,
             "nuclear"
@@ -55,9 +55,9 @@ workflow CELLSAM_SEGMENT {
     }
 
     // Create channel for CELLMEASUREMENT input adding the segmentation masks
-    if (params.skip_nuclear_mask) {
+    if (params.use_whole_cell_only) {
         // When skipping nuclear mask, use the whole-cell mask as a placeholder for nuclear
-        // (cellmeasurement.py will ignore it due to --skip-nuclear-mask flag)
+        // (cellmeasurement.py will ignore it due to --use-whole-cell-only flag)
         ch_cellsam_segment
             .join(CELLSAMWC.out.segmentation_mask)
             .map {
@@ -103,7 +103,7 @@ workflow CELLSAM_SEGMENT {
     // Optional mask smoothing to reduce polygon complexity
     //
     if (params.smooth_masks) {
-        if (!params.skip_nuclear_mask) {
+        if (!params.use_whole_cell_only) {
             SMOOTHMASKS_NUC(
                 ch_cellmeasurement.map { sample, _tiff, nuclear_mask, _whole_cell_mask -> [sample, nuclear_mask] }
             )
@@ -111,7 +111,7 @@ workflow CELLSAM_SEGMENT {
         SMOOTHMASKS_WC(
             ch_cellmeasurement.map { sample, _tiff, _nuclear_mask, whole_cell_mask -> [sample, whole_cell_mask] }
         )
-        if (!params.skip_nuclear_mask) {
+        if (!params.use_whole_cell_only) {
             ch_cellmeasurement
                 .map { sample, tiff, _nuclear_mask, _whole_cell_mask -> [sample, tiff] }
                 .join(SMOOTHMASKS_NUC.out.smoothed_mask)
@@ -143,7 +143,7 @@ workflow CELLSAM_SEGMENT {
     //
     ch_kronos_embeddings = channel.empty()
     ch_kronos_marker_report = channel.empty()
-    if (!params.skip_kronos) {
+    if (params.enable_kronos) {
 
         // Create channel for KRONOS input: tiff + whole-cell mask + geojson
         ch_cellsam_segment
@@ -223,7 +223,7 @@ workflow CELLSAM_SEGMENT {
     }
 
     emit:
-    nuclear_segmentation_mask    = params.skip_nuclear_mask ? channel.empty() : CELLSAMNUC.out.segmentation_mask  // channel: [ val(meta), *.tiff ]
+    nuclear_segmentation_mask    = params.use_whole_cell_only ? channel.empty() : CELLSAMNUC.out.segmentation_mask  // channel: [ val(meta), *.tiff ]
     wholecell_segmentation_mask  = CELLSAMWC.out.segmentation_mask        // channel: [ val(meta), *.tiff ]
     annotations                  = ch_annotations                         // channel: [ val(meta), *.geojson ]
     kronos_embeddings            = ch_kronos_embeddings                   // channel: [ val(meta), *.csv ] OPTIONAL

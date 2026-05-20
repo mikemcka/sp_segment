@@ -81,7 +81,7 @@ def parse_args() -> argparse.Namespace:
       tolerance.
     * **Performance** — thread count, tile size/overlap (compatibility only).
     * **Output variants** — pretty-printed JSON, optional rasterized label
-      mask TIFF, and ``--skip-nuclear-mask`` mode.
+      mask TIFF, and ``--use-whole-cell-only`` mode.
     """
     p = argparse.ArgumentParser(description="Extract cell measurements from masks and image TIFF.")
     p.add_argument("-n", "--nuclear-mask", required=True, help="Nuclear segmentation mask TIFF")
@@ -90,7 +90,13 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("-o", "--output-file", required=True, help="Output GeoJSON path")
     p.add_argument("-d", "--downsample-factor", type=float, default=1.0)
     p.add_argument("-p", "--pixel-size-microns", type=float, default=0.5)
-    p.add_argument("--skip-measurements", action="store_true")
+    p.add_argument(
+        "--measurements",
+        dest="measurements",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+        help="Enable compartment and intensity measurements. Enabled by default; use --no-measurements to disable.",
+    )
     p.add_argument("--simplify-rois", action="store_true",
                    help="Simplify ROI geometry with Douglas-Peucker. Enabled by default; use --no-simplify-rois to disable.")
     p.add_argument("--no-simplify-rois", dest="simplify_rois", action="store_false")
@@ -117,10 +123,12 @@ def parse_args() -> argparse.Namespace:
                    help="Gzip-compress the output GeoJSON file (appends .gz to filename if needed)")
     p.add_argument("--output-mask", default="",
                    help="Write a rasterized label mask TIFF from the final cell geometries")
-    p.add_argument("--skip-nuclear-mask", action="store_true",
+    p.add_argument("--use-whole-cell-only", dest="use_whole_cell_only", action="store_true",
                    help="Ignore the nuclear mask entirely. ROIs are generated from the whole-cell mask only. "
                         "Compartmental measurements (Nucleus, Cytoplasm, Membrane) are skipped. "
                         "Cell, erosion, and expansion measurements are still produced.")
+    # Backward-compatible alias.
+    p.add_argument("--skip-nuclear-mask", dest="use_whole_cell_only", action="store_true", help=argparse.SUPPRESS)
     p.add_argument("--neighbors", type=int, default=0,
                    help="Number of nearest neighbors for neighborhood feature aggregation (0 = disabled). "
                         "Computes max and mean of every numeric measurement across each cell's k closest neighbours.")
@@ -1259,7 +1267,7 @@ def feature_for_cell(
     simplify_rois: bool,
     tolerance: float,
     pixel_size_microns: float,
-    skip_measurements: bool,
+    measurements_enabled: bool,
     ch_names: Sequence[str],
     percentiles: Sequence[float],
     erosion_enabled: bool = False,
@@ -1308,8 +1316,8 @@ def feature_for_cell(
         Simplification tolerance in pixels.
     pixel_size_microns : float
         Pixel size for converting area/length to physical units.
-    skip_measurements : bool
-        If True, only shape metrics are computed (no intensity stats).
+    measurements_enabled : bool
+        If True, compute intensity/compartment measurements in addition to shape metrics.
     ch_names : sequence of str
         Channel names.
     percentiles, erosion_enabled : sequences/bool
@@ -1342,7 +1350,7 @@ def feature_for_cell(
     measurements: Dict[str, Any] = {}
     measurements.update(basic_shape_metrics(cmask, nmask, pixel_size_microns))
 
-    if not skip_measurements:
+    if measurements_enabled:
         # Derive sub-cellular compartment masks (cell, nucleus, cytoplasm, membrane)
         comps = compartment_masks(cmask, nmask)
         add_intensity_measurements(measurements, image_crop, ch_names, comps)
@@ -1455,7 +1463,7 @@ def iter_tasks(
             args.simplify_rois,
             args.tolerance,
             args.pixel_size_microns,
-            args.skip_measurements,
+            args.measurements,
             tuple(ch_names),
             tuple(percentiles),
             erosion_enabled,
@@ -1504,7 +1512,7 @@ def iter_tasks_coords(
             args.simplify_rois,
             args.tolerance,
             args.pixel_size_microns,
-            args.skip_measurements,
+            args.measurements,
             tuple(ch_names),
             tuple(percentiles),
             erosion_enabled,
@@ -1521,7 +1529,7 @@ def _feature_for_cell_global(
     simplify_rois: bool,
     tolerance: float,
     pixel_size_microns: float,
-    skip_measurements: bool,
+    measurements_enabled: bool,
     ch_names: Sequence[str],
     percentiles: Sequence[float],
     erosion_enabled: bool = False,
@@ -1551,7 +1559,7 @@ def _feature_for_cell_global(
     return feature_for_cell(
         cell_id, cell_crop, nuc_crop, img_crop, r0, c0,
         rec_cell_label, rec_nucleus_label, simplify_rois, tolerance,
-        pixel_size_microns, skip_measurements, ch_names, percentiles,
+        pixel_size_microns, measurements_enabled, ch_names, percentiles,
         erosion_enabled, expansion_enabled, environment_expansion,
     )
 
@@ -1882,7 +1890,7 @@ def main() -> int:
        Optionally downsample all three arrays by the same factor.
     3. **Match cells** — pair nuclear and whole-cell labels via centroid
        proximity (``match_cells``); synthesize boundaries for unmatched
-       nuclei via watershed.  In ``--skip-nuclear-mask`` mode, whole-cell
+       nuclei via watershed.  In ``--use-whole-cell-only`` mode, whole-cell
        labels are used directly.
     4. **Measure** — for each cell, extract a bounding-box crop and compute
        shape metrics + intensity statistics from the **raw raster mask**
@@ -1931,7 +1939,7 @@ def main() -> int:
     # Stage 2: Load inputs and optionally downsample
     # ===================================================================
     whole = load_label_mask(args.whole_cell_mask)
-    if args.skip_nuclear_mask:
+    if args.use_whole_cell_only:
         nuc = None
     else:
         nuc = load_label_mask(args.nuclear_mask)
@@ -1950,10 +1958,10 @@ def main() -> int:
     if nuc is not None:
         print(f"Loaded nuclear mask: {nuc.shape}")
     else:
-        print("Nuclear mask: skipped (--skip-nuclear-mask)")
+        print("Nuclear mask: skipped (--use-whole-cell-only)")
 
-    if args.skip_nuclear_mask:
-        print("--skip-nuclear-mask: using whole-cell mask only (no compartmental measurements)")
+    if args.use_whole_cell_only:
+        print("--use-whole-cell-only: using whole-cell mask only (no compartmental measurements)")
         # Use whole-cell labels directly; broadcast stub avoids allocating a full-size zeros array (~6 GiB).
         cell_labels = whole
         nuc_labels = np.broadcast_to(np.int64(0), whole.shape)
@@ -2023,8 +2031,8 @@ def main() -> int:
     global _GLOBAL_IMG, _GLOBAL_CELL, _GLOBAL_NUC, _GLOBAL_SKIP_NUC  # declared here; cleared again in Stage 5
     _GLOBAL_IMG = img_cyx
     _GLOBAL_CELL = cell_labels
-    _GLOBAL_NUC = None if args.skip_nuclear_mask else nuc_labels
-    _GLOBAL_SKIP_NUC = args.skip_nuclear_mask
+    _GLOBAL_NUC = None if args.use_whole_cell_only else nuc_labels
+    _GLOBAL_SKIP_NUC = args.use_whole_cell_only
 
     h_img, w_img = image_shape
     task_iter = iter_tasks_coords(

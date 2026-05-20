@@ -61,7 +61,7 @@
                     "type": "string",
                     "description": "Method used to combine membrane channels (product or max). Using product is not recommended for large numbers of channels with large images as this may use a lot of memory.",
                     "fa_icon": "fas fa-compress-arrows-alt",
-                    "enum": ["prod", "max"]
+                    "enum": ["max", "prod"]
                 }
             }
         },
@@ -274,12 +274,12 @@
             "description": "Parameters for KRONOS foundation model cell embedding extraction.",
             "help_text": "KRONOS is a foundation model for multiplex spatial proteomic images. These parameters control the embedding extraction step that runs after cell measurement.",
             "properties": {
-                "skip_kronos": {
+                "enable_kronos": {
                     "type": "boolean",
-                    "default": true,
+                    "default": false,
                     "description": "Skip KRONOS embedding extraction step.",
                     "fa_icon": "fas fa-stopwatch",
-                    "help_text": "Set this to `false` to run KRONOS embedding extraction after cell measurement. Requires kronos_model_path and kronos_marker_metadata to be set."
+                    "help_text": "Set this to `true` to run KRONOS embedding extraction after cell measurement. Requires kronos_model_path and kronos_marker_metadata to be set."
                 },
                 "kronos_model_path": {
                     "type": "string",
@@ -427,12 +427,18 @@
             "description": "Parameters used for cell measurement.",
             "help_text": "These parameters controls parameters used by the cellmeasurement step of the pipeline.",
             "properties": {
-                "skip_measurements": {
+                "enable_measurements": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Enable cell measurement step.",
+                    "fa_icon": "fas fa-stopwatch",
+                    "help_text": "Set this to `false` to skip the cell measurement step of the pipeline. Nuclei and whole-cells will still be merged but compartment metrics will not be calculated (this can save processing time)."
+                },
+                "use_whole_cell_only": {
                     "type": "boolean",
                     "default": false,
-                    "description": "Skip cell measurement step.",
-                    "fa_icon": "fas fa-stopwatch",
-                    "help_text": "Set this to `true` to skip the cell measurement step of the pipeline. Nuclei and whole-cells will still be merged but compartment metrics will not be calculated (this can save processing time)."
+                    "description": "Ignore the nuclear mask and generate ROIs from the whole-cell mask only. Skips compartmental measurements (Nucleus, Cytoplasm, Membrane) but retains Cell, erosion, and expansion measurements.",
+                    "fa_icon": "fas fa-ban"
                 },
                 "percentiles": {
                     "type": "string",
@@ -477,12 +483,6 @@
                     "fa_icon": "fas fa-expand-arrows-alt",
                     "minimum": 0
                 },
-                "skip_nuclear_mask": {
-                    "type": "boolean",
-                    "default": false,
-                    "description": "Ignore the nuclear mask and generate ROIs from the whole-cell mask only. Skips compartmental measurements (Nucleus, Cytoplasm, Membrane) but retains Cell, erosion, and expansion measurements.",
-                    "fa_icon": "fas fa-ban"
-                },
                 "neighbors": {
                     "type": "integer",
                     "default": 5,
@@ -493,7 +493,8 @@
                 },
                 "gzip_geojson": {
                     "type": "boolean",
-                    "default": false,
+                    "default": true,
+                    "hidden": true,
                     "description": "Gzip-compress the output GeoJSON files. Produces .geojson.gz instead of .geojson.",
                     "fa_icon": "fas fa-file-archive",
                     "help_text": "Enable this to gzip-compress the GeoJSON output from cellmeasurement. For large images with hundreds of thousands of cells, the GeoJSON can be 100+ GB uncompressed. Gzip typically achieves 10-20x compression on JSON with floating-point coordinates. The compressed files can be used directly with the import_large_geojson pipeline."
@@ -526,7 +527,7 @@
                     "default": true,
                     "description": "Generate segmentation report.",
                     "fa_icon": "fas fa-stopwatch",
-                    "help_text": "Set this to `true` to generate a segmentation report. It is recommended that skip_measurements is set to `false` for the most comprehensive report. Skipping this step can save on processing time."
+                    "help_text": "Set this to `true` to generate a segmentation report. It is recommended that enable_measurements is set to `true` for the most comprehensive report. Skipping this step can save on processing time."
                 }
             }
         },

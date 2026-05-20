@@ -35,9 +35,9 @@ workflow SOPA_SEGMENT {
         }.set { ch_combined }
 
     //
-    // Run segmentation for nuclear compartment (skipped if skip_nuclear_mask)
+    // Run segmentation for nuclear compartment (skipped if use_whole_cell_only is true)
     //
-    if (!params.skip_nuclear_mask) {
+    if (!params.use_whole_cell_only) {
         SOPA_SEGMENT_NUCLEAR(
             ch_combined.map {
                 meta,
@@ -67,9 +67,9 @@ workflow SOPA_SEGMENT {
     //
     // Create a channel for cell measurement
     //
-    if (params.skip_nuclear_mask) {
+    if (params.use_whole_cell_only) {
         // When skipping nuclear mask, use the whole-cell mask as a placeholder for nuclear
-        // (cellmeasurement.py will ignore it due to --skip-nuclear-mask flag)
+        // (cellmeasurement.py will ignore it due to --use-whole-cell-only flag)
         SOPA_SEGMENT_WHOLECELL.out.tiff
             .join(ch_sopa, by: 0)
             .map {
@@ -107,7 +107,7 @@ workflow SOPA_SEGMENT {
     // Optional mask smoothing to reduce polygon complexity
     //
     if (params.smooth_masks) {
-        if (!params.skip_nuclear_mask) {
+        if (!params.use_whole_cell_only) {
             SMOOTHMASKS_NUC(
                 ch_cellmeasurement.map {
                     meta, _tiff, nuclear_tiff, _wholecell_tiff -> [meta, nuclear_tiff]
@@ -119,7 +119,7 @@ workflow SOPA_SEGMENT {
                 meta, _tiff, _nuclear_tiff, wholecell_tiff -> [meta, wholecell_tiff]
             }
         )
-        if (!params.skip_nuclear_mask) {
+        if (!params.use_whole_cell_only) {
             ch_cellmeasurement
                 .map { meta, tiff, _nuclear_tiff, _wholecell_tiff -> [meta, tiff] }
                 .join(SMOOTHMASKS_NUC.out.smoothed_mask)
@@ -151,7 +151,7 @@ workflow SOPA_SEGMENT {
     //
     ch_kronos_embeddings = channel.empty()
     ch_kronos_marker_report = channel.empty()
-    if (!params.skip_kronos) {
+    if (params.enable_kronos) {
 
         // Create channel for KRONOS input: original tiff + whole-cell mask + geojson
         ch_sopa

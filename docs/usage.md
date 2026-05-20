@@ -116,7 +116,7 @@ Works for both mesmer and sopa segmentation.
 
 | Parameter Name | Description                                                |
 | -------------- | ---------------------------------------------------------- |
-| combine_method | Method used to combine membrane channels (product or max). |
+| combine_method | Method used to combine membrane channels (max or product). |
 
 ### Mesmer parameters
 
@@ -163,7 +163,7 @@ The following Mesmer parameters can be set:
 
 | Parameter Name              | Description                                                                                                                     |
 | --------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
-| `skip_kronos`               | Skip the KRONOS embedding step entirely (default: `true`).                                                                      |
+| `enable_kronos`             | Enable the KRONOS embedding step entirely (default: `false`).                                                                   |
 | `kronos_model_path`         | **Required** path to the directory containing the pre-trained KRONOS `.pt` checkpoint.                                          |
 | `kronos_marker_metadata`    | **Required** path to a CSV file mapping marker channel names to KRONOS input slots.                                             |
 | `kronos_config_path`        | Path to a KRONOS YAML config file overriding default model settings (default: `null`).                                          |
@@ -194,18 +194,18 @@ The following Mesmer parameters can be set:
 
 | Parameter Name              | Description                                                                                                                   |
 | --------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
-| skip_measurements           | Do not calculate intensity and shape measurements for cell compartments (faster execution)                                    |
-| percentiles                 | Comma-separated list of percentiles to calculate per channel. Skip measurements must be set to `false` to use this parameter. |
+| enable_measurements         | Calculate intensity and shape measurements for cell compartments (disabling will decrease execution time)                     |
+| percentiles                 | Comma-separated list of percentiles to calculate per channel. Enable measurements must be set to `true` to use this parameter.|
 | pixel_size_microns          | Pixel size in microns, use 0.28 for COMET and 0.390625 for MIBI                                                               |
 | estimate_cell_boundary_dist | Where no matching membrane ROI exists, expand the nucleus by this many pixels                                                 |
 | dist_threshold              | Maximum centroid distance in pixels for matching a nucleus to a whole-cell ROI (default: `10.0`).                             |
 | downsample_factor           | Integer downsample factor applied to image and masks before measurement, `1` = disabled (default: `1.0`).                     |
-| skip_nuclear_mask           | Ignore the nuclear mask; ROIs are generated from whole-cell mask only; compartmental measurements are skipped.                |
+| use_whole_cell_only         | Ignore the nuclear mask; ROIs are generated from whole-cell mask only; compartmental measurements are skipped.                |
 | neighbors                   | Number of nearest neighbours for neighbourhood feature aggregation, `0` = disabled (default: `5`).                            |
 | erosion_steps               | Measure intensity in 5 equal-area erosion bins from the cell/nucleus boundary inward (default: `true`).                       |
 | expansion_steps             | Measure intensity in 5 equal-area expansion bins within 20 µm outward from the cell boundary (default: `true`).               |
 | environment_expansion       | Measure a pericellular 20 µm environment zone around each cell (default: `true`).                                             |
-| gzip_geojson                | Gzip-compress the output GeoJSON (produces `.geojson.gz`). Recommended for large whole-slide images (default: `false`).       |
+| gzip_geojson                | Gzip-compress the output GeoJSON (produces `.geojson.gz`). Recommended for large whole-slide images (default: `true`).        |
 
 ### Report parameters
 
