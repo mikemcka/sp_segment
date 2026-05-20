@@ -192,20 +192,20 @@ The following Mesmer parameters can be set:
 
 ### Cell measurement options
 
-| Parameter Name              | Description                                                                                                                   |
-| --------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
-| enable_measurements         | Calculate intensity and shape measurements for cell compartments (disabling will decrease execution time)                     |
-| percentiles                 | Comma-separated list of percentiles to calculate per channel. Enable measurements must be set to `true` to use this parameter.|
-| pixel_size_microns          | Pixel size in microns, use 0.28 for COMET and 0.390625 for MIBI                                                               |
-| estimate_cell_boundary_dist | Where no matching membrane ROI exists, expand the nucleus by this many pixels                                                 |
-| dist_threshold              | Maximum centroid distance in pixels for matching a nucleus to a whole-cell ROI (default: `10.0`).                             |
-| downsample_factor           | Integer downsample factor applied to image and masks before measurement, `1` = disabled (default: `1.0`).                     |
-| use_whole_cell_only         | Ignore the nuclear mask; ROIs are generated from whole-cell mask only; compartmental measurements are skipped.                |
-| neighbors                   | Number of nearest neighbours for neighbourhood feature aggregation, `0` = disabled (default: `5`).                            |
-| erosion_steps               | Measure intensity in 5 equal-area erosion bins from the cell/nucleus boundary inward (default: `true`).                       |
-| expansion_steps             | Measure intensity in 5 equal-area expansion bins within 20 µm outward from the cell boundary (default: `true`).               |
-| environment_expansion       | Measure a pericellular 20 µm environment zone around each cell (default: `true`).                                             |
-| gzip_geojson                | Gzip-compress the output GeoJSON (produces `.geojson.gz`). Recommended for large whole-slide images (default: `true`).        |
+| Parameter Name              | Description                                                                                                                    |
+| --------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| enable_measurements         | Calculate intensity and shape measurements for cell compartments (disabling will decrease execution time)                      |
+| percentiles                 | Comma-separated list of percentiles to calculate per channel. Enable measurements must be set to `true` to use this parameter. |
+| pixel_size_microns          | Pixel size in microns, use 0.28 for COMET and 0.390625 for MIBI                                                                |
+| estimate_cell_boundary_dist | Where no matching membrane ROI exists, expand the nucleus by this many pixels                                                  |
+| dist_threshold              | Maximum centroid distance in pixels for matching a nucleus to a whole-cell ROI (default: `10.0`).                              |
+| downsample_factor           | Integer downsample factor applied to image and masks before measurement, `1` = disabled (default: `1.0`).                      |
+| use_whole_cell_only         | Ignore the nuclear mask; ROIs are generated from whole-cell mask only; compartmental measurements are skipped.                 |
+| neighbors                   | Number of nearest neighbours for neighbourhood feature aggregation, `0` = disabled (default: `5`).                             |
+| erosion_steps               | Measure intensity in 5 equal-area erosion bins from the cell/nucleus boundary inward (default: `true`).                        |
+| expansion_steps             | Measure intensity in 5 equal-area expansion bins within 20 µm outward from the cell boundary (default: `true`).                |
+| environment_expansion       | Measure a pericellular 20 µm environment zone around each cell (default: `true`).                                              |
+| gzip_geojson                | Gzip-compress the output GeoJSON (produces `.geojson.gz`). Recommended for large whole-slide images (default: `true`).         |
 
 ### Report parameters
 

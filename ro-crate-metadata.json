@@ -105,37 +105,21 @@
         },
         {
             "@id": "main.nf",
-            "@type": [
-                "File",
-                "SoftwareSourceCode",
-                "ComputationalWorkflow"
-            ],
+            "@type": ["File", "SoftwareSourceCode", "ComputationalWorkflow"],
             "dateCreated": "",
             "dateModified": "2025-08-06T12:29:12Z",
             "dct:conformsTo": "https://bioschemas.org/profiles/ComputationalWorkflow/1.0-RELEASE/",
-            "keywords": [
-                "nf-core",
-                "nextflow"
-            ],
-            "license": [
-                "MIT"
-            ],
-            "name": [
-                "WEHI-SODA-Hub/sp_segment"
-            ],
+            "keywords": ["nf-core", "nextflow"],
+            "license": ["MIT"],
+            "name": ["WEHI-SODA-Hub/sp_segment"],
             "programmingLanguage": {
                 "@id": "https://w3id.org/workflowhub/workflow-ro-crate#nextflow"
             },
             "sdPublisher": {
                 "@id": "https://nf-co.re/"
             },
-            "url": [
-                "https://github.com/WEHI-SODA-Hub/sp_segment",
-                "https://nf-co.re/WEHI-SODA-Hub/sp_segment/dev/"
-            ],
-            "version": [
-                "1.0.0dev"
-            ]
+            "url": ["https://github.com/WEHI-SODA-Hub/sp_segment", "https://nf-co.re/WEHI-SODA-Hub/sp_segment/dev/"],
+            "version": ["1.0.0dev"]
         },
         {
             "@id": "https://w3id.org/workflowhub/workflow-ro-crate#nextflow",
