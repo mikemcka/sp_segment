@@ -7,7 +7,7 @@
                         {
                             "id": "test_whole_cell"
                         },
-                        "test_whole_cell_whole-cell.tiff:md5,997f6f3bb252768f5f23fec9bda790a9"
+                        "test_whole_cell_whole-cell.tiff:md5,6d2f15cac3f91e683f722ad612b89e03"
                     ]
                 ],
                 "1": [
@@ -18,7 +18,7 @@
                         {
                             "id": "test_whole_cell"
                         },
-                        "test_whole_cell_whole-cell.tiff:md5,997f6f3bb252768f5f23fec9bda790a9"
+                        "test_whole_cell_whole-cell.tiff:md5,6d2f15cac3f91e683f722ad612b89e03"
                     ]
                 ],
                 "versions": [
@@ -30,7 +30,7 @@
             "nf-test": "0.9.2",
             "nextflow": "25.04.4"
         },
-        "timestamp": "2026-04-17T17:00:30.363094656"
+        "timestamp": "2026-05-20T15:02:50.764164237"
     },
     "cellsamsegment - stub": {
         "content": [
@@ -73,7 +73,7 @@
                         {
                             "id": "test_nuclear"
                         },
-                        "test_nuclear_nuclear.tiff:md5,e3c87a0e3c3f35ab4844a2bd9524735d"
+                        "test_nuclear_nuclear.tiff:md5,262c8318f9c63788cc9ac243535b0130"
                     ]
                 ],
                 "1": [
@@ -84,7 +84,7 @@
                         {
                             "id": "test_nuclear"
                         },
-                        "test_nuclear_nuclear.tiff:md5,e3c87a0e3c3f35ab4844a2bd9524735d"
+                        "test_nuclear_nuclear.tiff:md5,262c8318f9c63788cc9ac243535b0130"
                     ]
                 ],
                 "versions": [
@@ -96,6 +96,6 @@
             "nf-test": "0.9.2",
             "nextflow": "25.04.4"
         },
-        "timestamp": "2026-04-17T16:59:31.514605068"
+        "timestamp": "2026-05-20T15:01:51.646029849"
     }
 }

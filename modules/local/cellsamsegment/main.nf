@@ -28,6 +28,7 @@ process CELLSAMSEGMENT {
 
     """
     ${cache_home}
+    mkdir -p \$HOME/.deepcell/models
     cellsam_segment.py \\
         ${tiff} \\
         --output ${prefix}_${compartment}.tiff \\
