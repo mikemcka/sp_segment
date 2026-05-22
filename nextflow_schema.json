@@ -51,6 +51,21 @@
                 }
             }
         },
+        "cell_processing_options": {
+            "title": "Cell processing options",
+            "type": "object",
+            "fa_icon": "fas fa-image",
+            "description": "Parameters used for cell processing.",
+            "properties": {
+                "use_whole_cell_only": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Use only the whole-cell segmentation to process cells (skip nuclear segmentation).",
+                    "fa_icon": "fas fa-stopwatch",
+                    "help_text": "Set this to `true` to use only the whole-cell segmentation to process cells. This will skip segmentation of nuclei and associated measurements but retains cell, erosion, and expansion measurements."
+                }
+            }
+        },
         "combine_channel_options": {
             "title": "Combine options",
             "type": "object",
@@ -434,12 +449,6 @@
                     "fa_icon": "fas fa-stopwatch",
                     "help_text": "Set this to `false` to skip the cell measurement step of the pipeline. Nuclei and whole-cells will still be merged but compartment metrics will not be calculated (this can save processing time)."
                 },
-                "use_whole_cell_only": {
-                    "type": "boolean",
-                    "default": false,
-                    "description": "Ignore the nuclear mask and generate ROIs from the whole-cell mask only. Skips compartmental measurements (Nucleus, Cytoplasm, Membrane) but retains Cell, erosion, and expansion measurements.",
-                    "fa_icon": "fas fa-ban"
-                },
                 "percentiles": {
                     "type": "string",
                     "default": "70,80,90,95,99",
@@ -661,6 +670,9 @@
         },
         {
             "$ref": "#/$defs/combine_channel_options"
+        },
+        {
+            "$ref": "#/$defs/cell_processing_options"
         },
         {
             "$ref": "#/$defs/sopa_options"

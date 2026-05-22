@@ -26,42 +26,37 @@ can be run. Whole-cell and nuclear segmentations are run separately, and then
 consolidated into whole cells with nuclei with full shape and intensity
 measurements per compartment. The output GeoJSON files can be viewed in QuPath.
 
-<details>
-  <summary>Click to view Mermaid diagram</summary>
-  ```mermaid
-    flowchart TD
-    A("COMET TIFF") --> B["Extract markers"]
-    B --> C["Background
-            subtraction"]
-    C --> D{"Segmentation
-                method"} & O["Backsub TIFF"]
-        N("COMET/MIBI TIFF") --> D
-        D -- Cellpose (COMET only) --> S["Combine
-                                         channels"]
-        S --> E["sopa convert"]
-        E --> F["sopa patchify"]
-        F --> G["cellpose
-                (nuclear)"]
-        F --> H["cellpose
-                (whole-cell)"]
-        G --> I["sopa resolve"]
-        H --> I
-        I --> J["parquet to tiff"]
-        J --> K["Cell measurement"]
-        D -- Mesmer (COMET/MIBI) --> L["mesmer
-                                       (nuclear)"]
-        D -- Mesmer (COMET/MIBI) --> M["mesmer
-                                       (whole-cell)"]
-        L --> K
-        M --> K
-        K --> P("GeoJSON")
-        K --> Q["segmentation
-                report"]
-        Q --> R("html file")
+```mermaid
+  flowchart TD
+  A("COMET TIFF") --> B["Extract markers"]
+  B --> C["Background
+          subtraction"]
+  C --> D{"Segmentation
+              method"} & O["Backsub TIFF"]
+      N("COMET/MIBI TIFF") --> D
+      D -- Cellpose (COMET only) --> S["Combine
+                                       channels"]
+      S --> E["sopa convert"]
+      E --> F["sopa patchify"]
+      F --> G["cellpose
+              (nuclear)"]
+      F --> H["cellpose
+              (whole-cell)"]
+      G --> I["sopa resolve"]
+      H --> I
+      I --> J["parquet to tiff"]
+      J --> K["Cell measurement"]
+      D -- Mesmer (COMET/MIBI) --> L["mesmer
+                                     (nuclear)"]
+      D -- Mesmer (COMET/MIBI) --> M["mesmer
+                                     (whole-cell)"]
+      L --> K
+      M --> K
+      K --> P("GeoJSON")
+      K --> Q["segmentation
+              report"]
+      Q --> R("html file")
 ```
-</details>
-
-![sp_segment workflow](assets/sp_segment_workflow.png)
 
 The pipeline uses the following tools:
 
