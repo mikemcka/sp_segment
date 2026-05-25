@@ -72,7 +72,8 @@ flowchart TD
   embeddings --> seg_report["Segmentation
                             report"]
   style seg_report stroke:#bbb,stroke-dasharray: 5 5
-  seg_report --> report["QC report"]`
+  seg_report --> report["QC report"]
+```
 
 The pipeline uses the following tools:
 
