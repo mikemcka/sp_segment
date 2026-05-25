@@ -206,6 +206,8 @@ The following Mesmer parameters can be set:
 | estimate_cell_boundary_dist | Where no matching membrane ROI exists, expand the nucleus by this many pixels                                                  |
 | dist_threshold              | Maximum centroid distance in pixels for matching a nucleus to a whole-cell ROI (default: `10.0`).                              |
 | downsample_factor           | Integer downsample factor applied to image and masks before measurement, `1` = disabled (default: `1.0`).                      |
+| tile_size                   | Tile size in pixels for measurement image reads (default: `2048`). Aim for 2-4x more tiles than the thread count.              |
+| tile_overlap                | Tile overlap in pixels for measurement image reads (default: `200`). Set at least as large as the largest cell diameter.       |
 | neighbors                   | Number of nearest neighbours for neighbourhood feature aggregation, `0` = disabled (default: `5`).                             |
 | erosion_steps               | Measure intensity in 5 equal-area erosion bins from the cell/nucleus boundary inward (default: `true`).                        |
 | expansion_steps             | Measure intensity in 5 equal-area expansion bins within 20 µm outward from the cell boundary (default: `true`).                |

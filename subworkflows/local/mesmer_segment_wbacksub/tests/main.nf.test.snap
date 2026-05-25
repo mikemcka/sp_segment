@@ -7,7 +7,7 @@
                         {
                             "id": "test"
                         },
-                        "test.geojson:md5,af60db3857b2dd3c0c1031f627a1d490"
+                        "test.geojson.gz:md5,11d3ed7c908939a848783dabea1378e9"
                     ]
                 ],
                 "1": [
@@ -41,7 +41,7 @@
                         {
                             "id": "test"
                         },
-                        "test.geojson:md5,af60db3857b2dd3c0c1031f627a1d490"
+                        "test.geojson.gz:md5,11d3ed7c908939a848783dabea1378e9"
                     ]
                 ],
                 "kronos_embeddings": [
@@ -76,6 +76,6 @@
             "nf-test": "0.9.2",
             "nextflow": "25.04.4"
         },
-        "timestamp": "2026-04-20T15:16:04.409700508"
+        "timestamp": "2026-05-25T10:17:19.365633226"
     }
 }

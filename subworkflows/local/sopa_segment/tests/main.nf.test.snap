@@ -7,7 +7,7 @@
                         {
                             "id": "test"
                         },
-                        "test.geojson:md5,86cfba965a022c655946dc8e57b35b16"
+                        "test.geojson.gz:md5,55713a32cc40753b499c1f6d4b5c4408"
                     ]
                 ],
                 "1": [
@@ -22,15 +22,15 @@
                 "4": [
                     "versions.yml:md5,8e296315445b63f508c16e0259cffcc1",
                     "versions.yml:md5,a6cc5826c831c9e7a20f46c8900bfec4",
-                    "versions.yml:md5,f8664f3e4055a3d1e1869c4a393051cf",
-                    "versions.yml:md5,faeace3d7ca5ba5d9d9ebf3a48c43c24"
+                    "versions.yml:md5,faeace3d7ca5ba5d9d9ebf3a48c43c24",
+                    "versions.yml:md5,fcb2371d278e519f1319485d85d11f77"
                 ],
                 "annotations": [
                     [
                         {
                             "id": "test"
                         },
-                        "test.geojson:md5,86cfba965a022c655946dc8e57b35b16"
+                        "test.geojson.gz:md5,55713a32cc40753b499c1f6d4b5c4408"
                     ]
                 ],
                 "kronos_embeddings": [
@@ -45,8 +45,8 @@
                 "versions": [
                     "versions.yml:md5,8e296315445b63f508c16e0259cffcc1",
                     "versions.yml:md5,a6cc5826c831c9e7a20f46c8900bfec4",
-                    "versions.yml:md5,f8664f3e4055a3d1e1869c4a393051cf",
-                    "versions.yml:md5,faeace3d7ca5ba5d9d9ebf3a48c43c24"
+                    "versions.yml:md5,faeace3d7ca5ba5d9d9ebf3a48c43c24",
+                    "versions.yml:md5,fcb2371d278e519f1319485d85d11f77"
                 ]
             }
         ],
@@ -54,6 +54,6 @@
             "nf-test": "0.9.2",
             "nextflow": "25.04.4"
         },
-        "timestamp": "2026-04-14T20:50:50.363879937"
+        "timestamp": "2026-05-25T10:25:01.664904344"
     }
 }

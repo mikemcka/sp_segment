@@ -9,7 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **cellmeasurement: Python replaces Groovy as the only implementation.** The original Groovy app
   (`https://github.com/WEHI-SODA-Hub/cellmeasurement`) is no longer used. All measurement logic
-  is now in `bin/cellmeasurement.py`.
+  is now in https://github.com/WEHI-SODA-Hub/cellmeasurement-py.
+
+- **cellmeasurement: tiled measurement processing has been re-implemented.** User can specify tile
+  size and overlap, and the app will process measurements for tiles in parallel.
 
 - **cellmeasurement: erosion measurement column names have changed.** The Groovy app produced
   columns named `{Channel}: {Compartment}: Eroded_{N}px: Mean/Median` where N was a fixed pixel

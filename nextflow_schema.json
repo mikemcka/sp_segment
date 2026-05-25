@@ -521,6 +521,22 @@
                     "description": "Downsample factor applied to the image and masks before measurement (1 = no downsampling).",
                     "fa_icon": "fas fa-compress-arrows-alt",
                     "help_text": "Integer downsample factor >= 2 to speed up measurement on very large images. The image is block-averaged; masks use block-max to preserve labels. Values < 2 are treated as 1 (no downsampling). Note that physical measurements (area, length) are scaled back to original pixel units."
+                },
+                "tile_size": {
+                    "type": "integer",
+                    "default": 2048,
+                    "description": "Tile size for large image measurement calculations.",
+                    "fa_icon": "fas fa-th",
+                    "minimum": 128,
+                    "help_text": "The tile size in pixels for cell measurement. Smaller tiles allow parallel processing but create some overhead. Aim for 2-4x more tiles than the thread count."
+                },
+                "tile_overlap": {
+                    "type": "integer",
+                    "default": 200,
+                    "description": "Tile overlap region in pixels. Should encompass typical cell size.",
+                    "fa_icon": "fas fa-compress-arrows-alt",
+                    "minimum": 0,
+                    "help_text": "The overlap between tiles. This should be set to at least the size of the largest cell in the image to ensure that measurements from cells are complete."
                 }
             }
         },

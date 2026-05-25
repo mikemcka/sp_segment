@@ -7,7 +7,7 @@
                         {
                             "id": "test"
                         },
-                        "test.geojson:md5,395ff21ce7977edb59c9bd5ad01303cc"
+                        "test.geojson.gz:md5,da0063d5e066732ea2d753c5abd21814"
                     ]
                 ],
                 "1": [
@@ -15,18 +15,18 @@
                         {
                             "id": "test"
                         },
-                        "test_mask.tiff:md5,3d35966c853418f42e9d34686816881c"
+                        "test_mask.tiff:md5,4c6a2a631ae3ce0a8256d8f8abdeb54c"
                     ]
                 ],
                 "2": [
-                    "versions.yml:md5,4923934e707ca0a66ca0922258f6a967"
+                    "versions.yml:md5,c21719ea9ad3f44a0d4b7e943338e587"
                 ],
                 "annotations": [
                     [
                         {
                             "id": "test"
                         },
-                        "test.geojson:md5,395ff21ce7977edb59c9bd5ad01303cc"
+                        "test.geojson.gz:md5,da0063d5e066732ea2d753c5abd21814"
                     ]
                 ],
                 "masks": [
@@ -34,11 +34,11 @@
                         {
                             "id": "test"
                         },
-                        "test_mask.tiff:md5,3d35966c853418f42e9d34686816881c"
+                        "test_mask.tiff:md5,4c6a2a631ae3ce0a8256d8f8abdeb54c"
                     ]
                 ],
                 "versions": [
-                    "versions.yml:md5,4923934e707ca0a66ca0922258f6a967"
+                    "versions.yml:md5,c21719ea9ad3f44a0d4b7e943338e587"
                 ]
             }
         ],
@@ -46,7 +46,7 @@
             "nf-test": "0.9.2",
             "nextflow": "25.04.4"
         },
-        "timestamp": "2026-04-14T14:14:31.505470318"
+        "timestamp": "2026-05-22T21:21:46.549687055"
     },
     "cellmeasurement - with cell expansion and skip measurements": {
         "content": [
@@ -101,7 +101,7 @@
                     ]
                 ],
                 "2": [
-                    "versions.yml:md5,4923934e707ca0a66ca0922258f6a967"
+                    "versions.yml:md5,c21719ea9ad3f44a0d4b7e943338e587"
                 ],
                 "annotations": [
                     [
@@ -120,7 +120,7 @@
                     ]
                 ],
                 "versions": [
-                    "versions.yml:md5,4923934e707ca0a66ca0922258f6a967"
+                    "versions.yml:md5,c21719ea9ad3f44a0d4b7e943338e587"
                 ]
             }
         ],
@@ -128,7 +128,7 @@
             "nf-test": "0.9.2",
             "nextflow": "25.04.4"
         },
-        "timestamp": "2026-04-14T14:15:02.876436754"
+        "timestamp": "2026-05-22T21:22:25.822190464"
     },
     "cellmeasurement - skip measurements": {
         "content": [

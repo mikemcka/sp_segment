@@ -26,37 +26,53 @@ can be run. Whole-cell and nuclear segmentations are run separately, and then
 consolidated into whole cells with nuclei with full shape and intensity
 measurements per compartment. The output GeoJSON files can be viewed in QuPath.
 
-```mermaid
-  flowchart TD
-  A("COMET TIFF") --> B["Extract markers"]
-  B --> C["Background
+Workflow diagram (steps in dotted lined boxes are optional):
+
+````mermaid
+flowchart TD
+  input_comet("COMET TIFF") --> extract["Extract markers"]
+  extract --> bgsub["Background
           subtraction"]
-  C --> D{"Segmentation
-              method"} & O["Backsub TIFF"]
-      N("COMET/MIBI TIFF") --> D
-      D -- Cellpose (COMET only) --> S["Combine
-                                       channels"]
-      S --> E["sopa convert"]
-      E --> F["sopa patchify"]
-      F --> G["cellpose
-              (nuclear)"]
-      F --> H["cellpose
-              (whole-cell)"]
-      G --> I["sopa resolve"]
-      H --> I
-      I --> J["parquet to tiff"]
-      J --> K["Cell measurement"]
-      D -- Mesmer (COMET/MIBI) --> L["mesmer
-                                     (nuclear)"]
-      D -- Mesmer (COMET/MIBI) --> M["mesmer
-                                     (whole-cell)"]
-      L --> K
-      M --> K
-      K --> P("GeoJSON")
-      K --> Q["segmentation
-              report"]
-      Q --> R("html file")
-```
+  bgsub --> choose{"Segmentation
+                   method"}
+  style extract stroke:#bbb,stroke-dasharray: 5 5
+  style bgsub stroke:#bbb,stroke-dasharray: 5 5
+
+  input_multi("COMET/MIBI/Opal TIFF") --> choose
+
+  choose -- Cellpose --> combine["Combine
+                                 channels"]
+  combine --> convert["sopa convert"]
+  convert --> patchify["sopa patchify"]
+  patchify --> nuclei_cp["cellpose
+          (nuclear)"]
+  patchify --> whole_cp["cellpose
+          (whole cell)"]
+  nuclei_cp --> resolve["sopa resolve"]
+  whole_cp --> resolve
+  resolve --> parquet2tiff["parquet to tiff"]
+  parquet2tiff --> measure["Cell measurement"]
+  choose -- Mesmer --> mesmer["mesmer
+                              (nuclear &
+                              whole cell)"]
+  mesmer --> measure
+  choose -- CellSAM --> cellsam["cellsam
+                                (nuclear &
+                                whole cell)"]
+  cellsam --> smooth["smooth masks"]
+  style smooth stroke:#bbb,stroke-dasharray: 5 5
+  smooth --> measure
+  measure --> geojson["GeoJSON"]
+  measure --> embeddings["KRONOS
+                         embeddings"]
+  embeddings --> csv["Embeddings CSV"]
+  embeddings --> marker_report["Marker report"]
+  embeddings --> merged_geojson["Merged GeoJSON"]
+  style embeddings stroke:#bbb,stroke-dasharray: 5 5
+  embeddings --> seg_report["Segmentation
+                            report"]
+  style seg_report stroke:#bbb,stroke-dasharray: 5 5
+  seg_report --> report["QC report"]`
 
 The pipeline uses the following tools:
 
@@ -100,7 +116,7 @@ Prepare a sample sheet as follows:
 sample,run_backsub,run_mesmer,run_cellpose,run_cellsam,tiff
 sample1,true,true,false,false,/path/to/sample1.tiff
 sample2,true,false,false,true,/path/to/sample2.tiff
-```
+````
 
 You may also prefer to use YAML for your samplesheet, either is supported:
 

@@ -10,7 +10,7 @@
                         [
                             [
                                 [
-                                    "0.parquet:md5,f2e1a6f0d6f5a6d5b8d6f946a5202a8b"
+                                    "0.parquet:md5,22513c5fb02725de58b4db868075b34d"
                                 ],
                                 "patches_file_image:md5,b026324c6904b2a9cb4b88d6d61c81d1"
                             ],
@@ -118,7 +118,7 @@
                                 [
                                     ".zattrs:md5,37c0eabf77e69009a9f0c878e69ea262",
                                     ".zgroup:md5,e20297935e73dd0154104d4ea53040ab",
-                                    "shapes.parquet:md5,c82107ed58752c8ae5346e915a598d9d"
+                                    "shapes.parquet:md5,95bdc05ab2fb0996577ae711761f01bc"
                                 ],
                                 [
                                     ".zattrs:md5,37c0eabf77e69009a9f0c878e69ea262",
@@ -135,7 +135,7 @@
                         {
                             "id": "test"
                         },
-                        "test_whole-cell.tiff:md5,4995049df4d54917689d30c20f657662"
+                        "test_whole-cell.tiff:md5,d02bd49283eb52ee4bd3deba594fb0c3"
                     ]
                 ],
                 "2": [
@@ -149,7 +149,7 @@
                         {
                             "id": "test"
                         },
-                        "test_whole-cell.tiff:md5,4995049df4d54917689d30c20f657662"
+                        "test_whole-cell.tiff:md5,d02bd49283eb52ee4bd3deba594fb0c3"
                     ]
                 ],
                 "versions": [
@@ -166,7 +166,7 @@
                         [
                             [
                                 [
-                                    "0.parquet:md5,f2e1a6f0d6f5a6d5b8d6f946a5202a8b"
+                                    "0.parquet:md5,22513c5fb02725de58b4db868075b34d"
                                 ],
                                 "patches_file_image:md5,b026324c6904b2a9cb4b88d6d61c81d1"
                             ],
@@ -274,7 +274,7 @@
                                 [
                                     ".zattrs:md5,37c0eabf77e69009a9f0c878e69ea262",
                                     ".zgroup:md5,e20297935e73dd0154104d4ea53040ab",
-                                    "shapes.parquet:md5,c82107ed58752c8ae5346e915a598d9d"
+                                    "shapes.parquet:md5,95bdc05ab2fb0996577ae711761f01bc"
                                 ],
                                 [
                                     ".zattrs:md5,37c0eabf77e69009a9f0c878e69ea262",
@@ -292,7 +292,7 @@
             "nf-test": "0.9.2",
             "nextflow": "25.04.4"
         },
-        "timestamp": "2026-04-20T15:01:01.49068654"
+        "timestamp": "2026-05-25T10:48:33.916123973"
     },
     "sopa_segment - tiff - whole-cell": {
         "content": [

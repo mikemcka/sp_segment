@@ -57,8 +57,8 @@ workflow MESMER_SEGMENT {
 
     // Create channel for CELLMEASUREMENT input adding the segmentation masks
     if (params.use_whole_cell_only) {
-        // When skipping nuclear mask, use the whole-cell mask as a placeholder for nuclear
-        // (cellmeasurement.py will ignore it due to --use-whole-cell-only flag)
+        // In whole-cell-only mode, provide whole-cell mask as a placeholder for the
+        // nuclear input channel; CELLMEASUREMENT omits --nuclear-mask in this mode.
         ch_mesmer_segment
             .join(MESMERWC.out.segmentation_mask)
             .map {

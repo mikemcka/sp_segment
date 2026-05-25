@@ -15,4 +15,4 @@ dependencies:
   - pip:
       - tensorflow-cpu>=2.8,<2.9
       - deepcell>=0.12,<0.13
-      - git+https://github.com/WEHI-SODA-Hub/MibiSegmentation.git
+      - git+https://github.com/WEHI-SODA-Hub/MibiSegmentation.git@0.3.1

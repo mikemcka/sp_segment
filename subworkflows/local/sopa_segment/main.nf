@@ -68,8 +68,8 @@ workflow SOPA_SEGMENT {
     // Create a channel for cell measurement
     //
     if (params.use_whole_cell_only) {
-        // When skipping nuclear mask, use the whole-cell mask as a placeholder for nuclear
-        // (cellmeasurement.py will ignore it due to --use-whole-cell-only flag)
+        // In whole-cell-only mode, provide whole-cell mask as a placeholder for the
+        // nuclear input channel; CELLMEASUREMENT omits --nuclear-mask in this mode.
         SOPA_SEGMENT_WHOLECELL.out.tiff
             .join(ch_sopa, by: 0)
             .map {

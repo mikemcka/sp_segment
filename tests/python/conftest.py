@@ -2,7 +2,7 @@
 Shared pytest configuration for bin/ script unit tests.
 
 Adds the repository's bin/ directory to sys.path so test modules can import
-pipeline scripts directly (e.g. ``import cellmeasurement as cm``).
+pipeline scripts directly
 """
 
 import sys
