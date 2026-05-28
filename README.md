@@ -22,15 +22,19 @@
 on COMET, MIBI, and OPAL data. For COMET, background subtraction can be performed
 followed by patched cellpose segmentation, non-patched mesmer segmentation, or
 CellSAM foundation model segmentation. For MIBI, mesmer or CellSAM segmentation
-can be run. Whole-cell and nuclear segmentations are run separately, and then
-consolidated into whole cells with nuclei with full shape and intensity
-measurements per compartment. The output GeoJSON files can be viewed in QuPath.
+can be run. Optionally, nuclear segmentation can be run and consolidated into
+whole cells with nuclei. This also allows for cell measurements per compartment,
+along with standard shape and channel intensity measurements, as well as extended
+measurement features such as erosion and expansion measurements, and
+neighbourhood aggregation. The output GeoJSON files can be viewed in QuPath. A
+segmentation report can also be generated to provide a QC summary of cell
+measurements.
 
 Workflow diagram (steps in dotted lined boxes are optional):
 
 ```mermaid
 flowchart TD
-  input_comet("COMET TIFF") --> extract["Extract markers"]
+  input_multi("COMET/MIBI/Opal TIFF") --> extract["Extract markers"]
   extract --> bgsub["Background
           subtraction"]
   bgsub --> choose{"Segmentation
@@ -38,38 +42,49 @@ flowchart TD
   style extract stroke:#bbb,stroke-dasharray: 5 5
   style bgsub stroke:#bbb,stroke-dasharray: 5 5
 
-  input_multi("COMET/MIBI/Opal TIFF") --> choose
-
   choose -- Cellpose --> combine["Combine
                                  channels"]
+
   combine --> convert["sopa convert"]
   convert --> patchify["sopa patchify"]
-  patchify --> nuclei_cp["cellpose
-          (nuclear)"]
-  patchify --> whole_cp["cellpose
-          (whole cell)"]
-  nuclei_cp --> resolve["sopa resolve"]
-  whole_cp --> resolve
+  patchify --> cp_nuc["cellpose
+                      (nuclear)"]
+  patchify --> cp_wc["cellpose
+                     (whole cell)"]
+  cp_nuc --> resolve["sopa resolve"]
+  style cp_nuc stroke:#bbb,stroke-dasharray: 5 5
+  cp_wc --> resolve
   resolve --> parquet2tiff["parquet to tiff"]
-  parquet2tiff --> measure["Cell measurement"]
-  choose -- Mesmer --> mesmer["mesmer
-                              (nuclear &
-                              whole cell)"]
-  mesmer --> measure
-  choose -- CellSAM --> cellsam["cellsam
-                                (nuclear &
-                                whole cell)"]
-  cellsam --> smooth["smooth masks"]
+  parquet2tiff --> smooth["smooth masks"]
+  smooth --> measure["Cell measurement"]
   style smooth stroke:#bbb,stroke-dasharray: 5 5
-  smooth --> measure
+
+  choose -- Mesmer --> mesmer_nuc["mesmer
+                                 (nuclear)"]
+  choose -- Mesmer --> mesmer_wc["mesmer
+                                 (whole-cell)"]
+  style mesmer_nuc stroke:#bbb,stroke-dasharray: 5 5
+  mesmer_nuc --> smooth
+  mesmer_wc --> smooth
+
+  choose -- CellSAM --> cs_nuc["cellsam
+                               (nuclear)"]
+  choose -- CellSAM --> cs_wc["cellsam
+                              (whole-cell)"]
+  style cs_nuc stroke:#bbb,stroke-dasharray: 5 5
+  cs_nuc --> smooth
+  cs_wc --> smooth
+
+  style smooth stroke:#bbb,stroke-dasharray: 5 5
   measure --> geojson["GeoJSON"]
   measure --> embeddings["KRONOS
-          embeddings"]
+                         embeddings"]
+  embeddings --> merged_geojson["GeoJSON + embeddings"]
   embeddings --> csv["Embeddings CSV"]
   embeddings --> marker_report["Marker report"]
-  embeddings --> merged_geojson["Merged GeoJSON"]
   style embeddings stroke:#bbb,stroke-dasharray: 5 5
-  embeddings --> seg_report["Segmentation
+
+  measure --> seg_report["Segmentation
                             report"]
   style seg_report stroke:#bbb,stroke-dasharray: 5 5
   seg_report --> report["QC report"]
@@ -83,7 +98,7 @@ The pipeline uses the following tools:
   CLI for running Mesmer segmentation of MIBI and OME-XML TIFFs.
 - [CellSAM](https://github.com/vanvalenlab/cellSAM) -- a foundation model for
   cell segmentation across diverse imaging modalities.
-- [cellmeasurement](https://github.com/WEHI-SODA-Hub/cellmeasurement) -- a
+- [cellmeasurement-py](https://github.com/WEHI-SODA-Hub/cellmeasurement-py) -- a
   Python app that matches whole-cell segmentations with nuclei and calculates
   compartment measurements and intensities.
 - [KRONOS](https://github.com/mahmoodlab/KRONOS) -- a foundation model for
@@ -100,9 +115,11 @@ Please see the [docs for more detailed information on pipeline usage and output]
 > [!NOTE]
 > If you are new to Nextflow and nf-core, please refer to [this page](https://nf-co.re/docs/usage/installation) on how to set-up Nextflow. Make sure to [test your setup](https://nf-co.re/docs/usage/introduction#how-to-run-a-pipeline) with `-profile test` (to test cellpose segmentation) or `-profile test_mesmer` to test mesmer segmentation before running the workflow on actual data.
 
-If you are running this pipeline from WEHI, it has been set up to run on [Seqera Platform](https://seqera.services.biocommons.org.au/).
+If you are running this pipeline from WEHI, it has been set up to run on
+[Seqera Platform](https://seqera.services.biocommons.org.au/).
 
-Usage will depend on your desired steps. See [usage docs](docs/usage.md) for more detailed information.
+Usage will depend on your desired steps. See [usage docs](docs/usage.md) for
+more detailed information.
 
 ### Background subtraction
 
@@ -157,8 +174,9 @@ nextflow run WEHI-SODA-Hub/sp_segment \
 
 ### Mesmer segmentation
 
-Before running Mesmer, ensure that you have a [deepcell access token](https://users.deepcell.org/login/)
-and that you have set it in your Nextflow secrets:
+Before running Mesmer, ensure that you have a [deepcell access
+token](https://users.deepcell.org/login/) and that you have set it in your
+Nextflow secrets:
 
 ```bash
 nextflow secrets set DEEPCELL_ACCESS_TOKEN $YOUR_TOKEN
@@ -209,102 +227,27 @@ can use set the parameter `enable_measurements` to `false`.
 
 ### KRONOS embeddings
 
-KRONOS is a foundation model for multiplex spatial proteomics that extracts rich embeddings for each cell. These embeddings capture cellular phenotype and microenvironment context, enabling downstream analysis like clustering, classification, and spatial analysis.
+KRONOS is a foundation model for multiplex spatial proteomics that extracts
+rich embeddings for each cell. These embeddings capture cellular phenotype and
+microenvironment context, enabling downstream analysis like clustering and
+spatial analysis.
 
-To enable KRONOS embeddings:
+Enable KRONOS with `--enable_kronos true` and provide the required model and
+marker metadata inputs. Detailed KRONOS parameters and marker-mapping guidance
+are documented in [docs/usage.md](docs/usage.md#kronos-embeddings), and KRONOS
+outputs are documented in [docs/output.md](docs/output.md#kronos-embeddings).
 
-```bash
-nextflow run main.nf \
-  --input samplesheet.csv \
-  --enable_kronos true \
-  --kronos_model_path /path/to/kronos_model \
-  --kronos_marker_metadata /path/to/marker_metadata.csv \
-  --kronos_merge_geojson true \
-  ...
-```
-
-#### KRONOS parameters
-
-- `--enable_kronos` (default: false): Set to `true` to enable KRONOS embedding extraction
-- `--kronos_model_path` (required): Path to the KRONOS model checkpoint (.pt file)
-- `--kronos_config_path` (optional): Path to KRONOS `config.json` (auto-detected from model directory if not set)
-- `--kronos_marker_metadata` (required): Path to marker metadata CSV file mapping marker IDs to names
-- `--kronos_merge_geojson` (default: false): Merge embeddings into the cellmeasurement GeoJSON output
-- `--kronos_patch_size` (default: 64): Patch size for cell-centered crops
-- `--kronos_batch_size` (default: 32): Batch size for model inference
-- `--kronos_num_workers` (default: 4): Number of DataLoader workers for parallel data loading
-- `--kronos_max_value` (default: 65535): Maximum intensity value for normalization
-- `--kronos_marker_mapping` (optional): JSON string mapping image marker names to KRONOS marker names
-- `--kronos_distance_threshold` (default: 5.0): Maximum centroid distance (pixels) used for GeoJSON merge fallback matching
-
-#### Embeddings for filtered data with KRONOS
-
-When `--kronos_merge_geojson` is enabled, the pipeline automatically creates a new segmentation mask directly from the GeoJSON polygons.
-
-#### Output files
-
-KRONOS produces the following outputs:
-
-- `*_kronos_embeddings.csv`: CSV file with cell IDs, centroids, and 384 embedding dimensions
-- `*_marker_report.txt`: Report showing which image channels were matched to KRONOS markers
-- `*_kronos_merged.geojson` (if `--kronos_merge_geojson=true`): GeoJSON file with embeddings added as cell properties
-
-The merged GeoJSON file contains all original cell measurements plus additional features (`kronos_emb_0` through `kronos_emb_#`), enabling integrated analysis of morphology, intensity, and KRONOS embeddings.
-
-#### Marker matching
-
-KRONOS expects specific marker names based on its training data. The pipeline automatically performs case-insensitive matching between your image channel names and the KRONOS marker metadata. For markers that don't auto-match, use `--kronos_marker_mapping`:
-
-```bash
---kronos_marker_mapping '{"CD3e": "CD3E", "PanCK": "PANCK"}'
-```
-
-For COMET data with fluorophore suffixes in channel names, you can map them like this:
-
-```bash
---kronos_marker_mapping '{"DAPI": "DAPI", "FOXP3_T - TRITC": "FOXP3", "CD3_T - Cy5": "CD3"}'
-```
-
-For more information about KRONOS, see the [KRONOS GitHub repository](https://github.com/mahmoodlab/KRONOS).
+For background on the model itself, see the
+[KRONOS GitHub repository](https://github.com/mahmoodlab/KRONOS).
 
 ### CellSAM segmentation
 
-CellSAM is a foundation model for cell segmentation that works across different
-imaging modalities. To use CellSAM as your segmentation algorithm, specify a
-config file like so:
+CellSAM is a foundation model for segmentation across imaging modalities.
+Enable it per sample using `run_cellsam: true` in the samplesheet.
 
-```csv
-sample,run_backsub,run_cellsam,tiff,nuclear_channel,membrane_channels
-sample1,true,true,/path/to/sample1.tiff,DAPI,CD45:CD8
-sample2,false,true,/path/to/sample2.tiff,DAPI,CD45
-```
-
-Nuclear channels only support one entry; membrane channels may have multiple
-values separated by `:` characters. If your channels have spaces in them, make
-sure that you surround your channel name with quotes.
-
-CellSAM uses a tiling approach for large images and supports the following
-parameters:
-
-- `--cellsam_bbox_threshold` (default: 0.4): Confidence threshold for cell detection
-- `--cellsam_block_size` (default: 600): Size of tiles for processing
-- `--cellsam_overlap` (default: 56): Tile overlap for merging
-- `--cellsam_iou_threshold` (default: 0.5): IOU threshold for label merging
-- `--cellsam_use_wsi` (default: true): Enable tiling for large images
-
-#### Model weights
-
-CellSAM can automatically download the latest model weights (v1.2) from
-[users.deepcell.org](https://users.deepcell.org). To use the latest weights:
-
-1. Create an account at [users.deepcell.org](https://users.deepcell.org)
-2. Generate your access token
-3. Set it as a Nextflow secret:
-   ```bash
-   nextflow secrets set DEEPCELL_ACCESS_TOKEN $YOUR_TOKEN
-   ```
-
-If the token is not set, CellSAM will use the default bundled model weights.
+Detailed CellSAM setup and parameters are documented in
+[docs/usage.md](docs/usage.md#cellsam-segmentation), and CellSAM output files
+are documented in [docs/output.md](docs/output.md#cellsam-segmentation).
 
 > [!NOTE]
 > You cannot run both Mesmer/Cellpose and CellSAM segmentation on the same sample
@@ -335,17 +278,22 @@ We thank the following people for their extensive assistance in the development 
 
 ## Contributions and Support
 
-If you would like to contribute to this pipeline, please see the [contributing guidelines](.github/CONTRIBUTING.md).
+If you would like to contribute to this pipeline, please see the [contributing
+guidelines](.github/CONTRIBUTING.md).
 
 ## Citations
 
-If you use WEHI-SODA-Hub/sp_segment for your analysis, please cite it using the following doi: [10.5281/zenodo.17103183](https://doi.org/10.5281/zenodo.17103183)
+If you use WEHI-SODA-Hub/sp_segment for your analysis, please cite it using the
+following doi:
+[10.5281/zenodo.17103183](https://doi.org/10.5281/zenodo.17103183)
 
 <!-- TODO nf-core: Add bibliography of tools and data used in your pipeline -->
 
-An extensive list of references for the tools used by the pipeline can be found in the [`CITATIONS.md`](CITATIONS.md) file.
+An extensive list of references for the tools used by the pipeline can be found
+in the [`CITATIONS.md`](CITATIONS.md) file.
 
-This pipeline was created using the `nf-core` template. You can cite the `nf-core` publication as follows:
+This pipeline was created using the `nf-core` template. You can cite the
+`nf-core` publication as follows:
 
 > **The nf-core framework for community-curated bioinformatics pipelines.**
 >

@@ -27,9 +27,10 @@ sample2,true,/path/to/sample2.tiff
 A full sample sheet is shown below:
 
 ```csv
-sample,run_backsub,run_mesmer,run_cellpose,tiff
-sample1,true,true,false,/path/to/sample1.tiff
-sample2,true,false,true,/path/to/sample2.tiff
+sample,run_backsub,run_mesmer,run_cellpose,run_cellsam,tiff
+sample1,true,true,false,false,/path/to/sample1.tiff
+sample2,true,false,true,false,/path/to/sample2.tiff
+sample3,false,false,false,true,/path/to/sample3.tiff
 ```
 
 You may also prefer to use YAML for your samplesheet, either is supported:
@@ -41,20 +42,29 @@ You may also prefer to use YAML for your samplesheet, either is supported:
   run_backsub: true
   run_mesmer: true
   run_cellpose: false
+  run_cellsam: false
   tiff: /path/to/sample1.tiff
 - sample: sample2
   run_backsub: true
-  run_mesmer: true
-  run_cellpose: false
+  run_mesmer: false
+  run_cellpose: true
+  run_cellsam: false
   tiff: /path/to/sample2.tiff
+- sample: sample3
+  run_backsub: false
+  run_mesmer: false
+  run_cellpose: false
+  run_cellsam: true
+  tiff: /path/to/sample3.tiff
 ```
 
 | Column         | Description                                                                                                           |
 | -------------- | --------------------------------------------------------------------------------------------------------------------- |
 | `sample`       | Custom sample name.                                                                                                   |
 | `run_backsub`  | Run background subtraction on the image                                                                               |
-| `run_mesmer`   | Run mesmer segmentation on the image (note: only one of run_mesmer and run_cellpose can be true for one sample row)   |
-| `run_cellpose` | Run cellpose segmentation on the image (note: only one of run_mesmer and run_cellpose can be true for one sample row) |
+| `run_mesmer`   | Run Mesmer segmentation on the image (only one of `run_mesmer`, `run_cellpose`, `run_cellsam` can be true per row).   |
+| `run_cellpose` | Run Cellpose segmentation on the image (only one of `run_mesmer`, `run_cellpose`, `run_cellsam` can be true per row). |
+| `run_cellsam`  | Run CellSAM segmentation on the image (only one of `run_mesmer`, `run_cellpose`, `run_cellsam` can be true per row).  |
 | `tiff`         | OME-TIFF for COMET or multi-channel TIFF from MIBI                                                                    |
 
 An [example samplesheet](../assets/samplesheet.csv) has been provided with the pipeline.
@@ -150,7 +160,20 @@ The following Mesmer parameters can be set:
 | cellpose_model_type         | Cellpose model to use for segmentation (e.g., nuclei, cyto, cyto2, cyto3 etc.). |
 | cellpose_pretrained_model   | Path to a pre-trained Cellpose model.                                           |
 
-### CellSAM parameters
+### CellSAM segmentation
+
+CellSAM is an optional segmentation backend for whole-cell and nuclear masks.
+Enable it per sample with `run_cellsam: true` in the samplesheet.
+
+For gated model downloads, set your DeepCell token as a Nextflow secret:
+
+```bash
+nextflow secrets set DEEPCELL_ACCESS_TOKEN $YOUR_TOKEN
+```
+
+If no token is provided, CellSAM uses the bundled default model.
+
+#### CellSAM parameters
 
 | Parameter Name                     | Description                                                                                                |
 | ---------------------------------- | ---------------------------------------------------------------------------------------------------------- |
@@ -165,7 +188,27 @@ The following Mesmer parameters can be set:
 | `cellsam_model_path`               | Path to a custom CellSAM model checkpoint. If `null` the built-in default model is used (default: `null`). |
 | `cellsam_min_area`                 | Minimum cell area in square pixels; smaller objects are discarded (default: `0`).                          |
 
-### KRONOS embedding parameters
+### KRONOS embeddings
+
+KRONOS is an optional embedding step that runs after cell measurement and
+writes per-cell embeddings plus a merged GeoJSON with KRONOS features.
+
+To enable KRONOS:
+
+```bash
+nextflow run WEHI-SODA-Hub/sp_segment \
+   -profile <docker/singularity/.../institute> \
+   --input samplesheet.csv \
+   --outdir <OUTDIR> \
+   --enable_kronos true \
+   --kronos_model_path /path/to/kronos_model_dir \
+   --kronos_marker_metadata /path/to/marker_metadata.csv
+```
+
+Channel names are matched case-insensitively to KRONOS marker metadata. Use
+`kronos_marker_mapping` when image channel names need explicit remapping.
+
+#### KRONOS embedding parameters
 
 | Parameter Name              | Description                                                                                                                     |
 | --------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
