@@ -675,7 +675,6 @@ def merge_embeddings_into_geojson(geojson_path, mask_path, cell_ids, centroids, 
                 if mask_label in mask_label_to_emb_idx:
                     emb_idx = mask_label_to_emb_idx[mask_label]
                     measurements = feature["properties"].setdefault("measurements", {})
-                    measurements["kronos_cell_id"] = int(cell_ids[emb_idx])
                     for i, col_name in enumerate(emb_columns):
                         measurements[col_name] = float(embeddings[emb_idx, i])
                     num_matched += 1
@@ -806,7 +805,6 @@ def merge_embeddings_into_geojson(geojson_path, mask_path, cell_ids, centroids, 
             if mask_label in mask_label_to_emb_idx:
                 emb_idx = mask_label_to_emb_idx[mask_label]
                 measurements = feature["properties"].setdefault("measurements", {})
-                measurements["kronos_cell_id"] = int(cell_ids[emb_idx])
                 for i, col_name in enumerate(emb_columns):
                     measurements[col_name] = float(embeddings[emb_idx, i])
                 num_matched += 1
