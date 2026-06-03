@@ -363,72 +363,6 @@
                 }
             }
         },
-        "mask_smoothing_options": {
-            "title": "Mask smoothing options",
-            "type": "object",
-            "fa_icon": "fas fa-magic",
-            "description": "Parameters for optional mask smoothing before cell measurement.",
-            "help_text": "Enable mask smoothing to reduce polygon complexity in segmentation masks. This can prevent StackOverflowError in QuPath's GeoJSON export when cell ROIs have overly complex/jagged boundaries.",
-            "properties": {
-                "smooth_masks": {
-                    "type": "boolean",
-                    "description": "Enable mask smoothing before cell measurement.",
-                    "fa_icon": "fas fa-wave-square",
-                    "help_text": "When enabled, segmentation masks are smoothed to reduce polygon complexity before being passed to cellmeasurement. Choose the method with smooth_method."
-                },
-                "smooth_method": {
-                    "type": "string",
-                    "default": "morphological",
-                    "description": "Smoothing algorithm: 'morphological' (disk close+open) or 'shapely' (Douglas-Peucker polygon simplification).",
-                    "fa_icon": "fas fa-cogs",
-                    "enum": ["morphological", "shapely"],
-                    "help_text": "'morphological' applies binary close then open with a disk kernel to smooth pixel boundaries. 'shapely' extracts the polygon boundary for each label and applies Shapely's simplify (Douglas-Peucker) algorithm, which directly reduces vertex count — the main cause of StackOverflowError in QuPath GeoJSON export."
-                },
-                "smooth_kernel_size": {
-                    "type": "integer",
-                    "default": 2,
-                    "minimum": 1,
-                    "maximum": 10,
-                    "description": "Disk radius for morphological close+open smoothing (pixels).",
-                    "fa_icon": "fas fa-circle",
-                    "help_text": "Larger values produce smoother boundaries but may merge nearby cells. Only used when smooth_masks is enabled."
-                },
-                "smooth_n_workers": {
-                    "type": "integer",
-                    "default": 8,
-                    "minimum": 1,
-                    "maximum": 64,
-                    "description": "Number of parallel worker processes for smoothing.",
-                    "fa_icon": "fas fa-tasks",
-                    "help_text": "Set to match available CPUs for optimal performance. Should match --cpus-per-task in your resource configuration"
-                },
-                "smooth_chunksize": {
-                    "type": "integer",
-                    "default": 200,
-                    "minimum": 1,
-                    "maximum": 10000,
-                    "description": "Number of labels per worker chunk.",
-                    "fa_icon": "fas fa-layer-group",
-                    "help_text": "Tune based on cell size distribution. Larger values for many small cells, smaller values for fewer large cells."
-                },
-                "smooth_tolerance": {
-                    "type": "number",
-                    "default": 1,
-                    "minimum": 0.01,
-                    "description": "[shapely] Douglas-Peucker simplification tolerance in pixels.",
-                    "fa_icon": "fas fa-sliders-h",
-                    "help_text": "Controls how aggressively polygon boundaries are simplified when smooth_method is 'shapely'. Higher values produce simpler (fewer vertex) polygons but less accurate boundaries. Important to minimise vertex count to prevent StackOverflowError in QuPath GeoJSON export. Tune based on typical cell size and boundary complexity. Start with threshold 1 and adjust as needed."
-                },
-                "smooth_min_area": {
-                    "type": "number",
-                    "default": 0,
-                    "minimum": 0,
-                    "description": "[shapely] Minimum polygon area in pixels² to retain after simplification.",
-                    "fa_icon": "fas fa-compress-arrows-alt",
-                    "help_text": "Labels whose simplified polygon area falls below this threshold are removed from the output mask. Useful for discarding fragments created by aggressive simplification. Only used when smooth_method is 'shapely'."
-                }
-            }
-        },
         "measurement_options": {
             "title": "Cell measurement options",
             "type": "object",
@@ -546,6 +480,72 @@
                     "description": "Generate segmentation report.",
                     "fa_icon": "fas fa-stopwatch",
                     "help_text": "Set this to `true` to generate a segmentation report. It is recommended that enable_measurements is set to `true` for the most comprehensive report. Skipping this step can save on processing time."
+                }
+            }
+        },
+        "mask_smoothing_options": {
+            "title": "Mask smoothing options",
+            "type": "object",
+            "fa_icon": "fas fa-magic",
+            "description": "Parameters for optional mask smoothing before cell measurement.",
+            "help_text": "Enable mask smoothing to reduce polygon complexity in segmentation masks. This can prevent StackOverflowError in QuPath's GeoJSON export when cell ROIs have overly complex/jagged boundaries.",
+            "properties": {
+                "smooth_masks": {
+                    "type": "boolean",
+                    "description": "Enable mask smoothing before cell measurement.",
+                    "fa_icon": "fas fa-wave-square",
+                    "help_text": "When enabled, segmentation masks are smoothed to reduce polygon complexity before being passed to cellmeasurement. Choose the method with smooth_method."
+                },
+                "smooth_method": {
+                    "type": "string",
+                    "default": "morphological",
+                    "description": "Smoothing algorithm: 'morphological' (disk close+open) or 'shapely' (Douglas-Peucker polygon simplification).",
+                    "fa_icon": "fas fa-cogs",
+                    "enum": ["morphological", "shapely"],
+                    "help_text": "'morphological' applies binary close then open with a disk kernel to smooth pixel boundaries. 'shapely' extracts the polygon boundary for each label and applies Shapely's simplify (Douglas-Peucker) algorithm, which directly reduces vertex count — the main cause of StackOverflowError in QuPath GeoJSON export."
+                },
+                "smooth_kernel_size": {
+                    "type": "integer",
+                    "default": 2,
+                    "minimum": 1,
+                    "maximum": 10,
+                    "description": "Disk radius for morphological close+open smoothing (pixels).",
+                    "fa_icon": "fas fa-circle",
+                    "help_text": "Larger values produce smoother boundaries but may merge nearby cells. Only used when smooth_masks is enabled."
+                },
+                "smooth_n_workers": {
+                    "type": "integer",
+                    "default": 8,
+                    "minimum": 1,
+                    "maximum": 64,
+                    "description": "Number of parallel worker processes for smoothing.",
+                    "fa_icon": "fas fa-tasks",
+                    "help_text": "Set to match available CPUs for optimal performance. Should match --cpus-per-task in your resource configuration"
+                },
+                "smooth_chunksize": {
+                    "type": "integer",
+                    "default": 200,
+                    "minimum": 1,
+                    "maximum": 10000,
+                    "description": "Number of labels per worker chunk.",
+                    "fa_icon": "fas fa-layer-group",
+                    "help_text": "Tune based on cell size distribution. Larger values for many small cells, smaller values for fewer large cells."
+                },
+                "smooth_tolerance": {
+                    "type": "number",
+                    "default": 1,
+                    "minimum": 0.01,
+                    "description": "[shapely] Douglas-Peucker simplification tolerance in pixels.",
+                    "fa_icon": "fas fa-sliders-h",
+                    "help_text": "Controls how aggressively polygon boundaries are simplified when smooth_method is 'shapely'. Higher values produce simpler (fewer vertex) polygons but less accurate boundaries. Important to minimise vertex count to prevent StackOverflowError in QuPath GeoJSON export. Tune based on typical cell size and boundary complexity. Start with threshold 1 and adjust as needed."
+                },
+                "smooth_min_area": {
+                    "type": "number",
+                    "default": 0,
+                    "minimum": 0,
+                    "description": "[shapely] Minimum polygon area in pixels² to retain after simplification.",
+                    "fa_icon": "fas fa-compress-arrows-alt",
+                    "help_text": "Labels whose simplified polygon area falls below this threshold are removed from the output mask. Useful for discarding fragments created by aggressive simplification. Only used when smooth_method is 'shapely'."
                 }
             }
         },
