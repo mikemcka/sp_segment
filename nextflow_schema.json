@@ -59,7 +59,6 @@
             "properties": {
                 "use_whole_cell_only": {
                     "type": "boolean",
-                    "default": false,
                     "description": "Use only the whole-cell segmentation to process cells (skip nuclear segmentation).",
                     "fa_icon": "fas fa-stopwatch",
                     "help_text": "Set this to `true` to use only the whole-cell segmentation to process cells. This will skip segmentation of nuclei and associated measurements but retains cell, erosion, and expansion measurements."
@@ -198,7 +197,6 @@
                 },
                 "mesmer_transpose_mask": {
                     "type": "boolean",
-                    "default": false,
                     "description": "Force-transpose the Mesmer output mask. Enable this if the segmentation result appears spatially flipped relative to the input image.",
                     "fa_icon": "fas fa-exchange-alt"
                 }
@@ -258,13 +256,11 @@
                 },
                 "cellsam_gauge_cell_size": {
                     "type": "boolean",
-                    "default": false,
                     "description": "Perform preliminary segmentation to estimate cell sizes.",
                     "fa_icon": "fas fa-ruler-combined"
                 },
                 "cellsam_low_contrast_enhancement": {
                     "type": "boolean",
-                    "default": false,
                     "description": "Apply contrast enhancement preprocessing for low-contrast images.",
                     "fa_icon": "fas fa-adjust"
                 },
@@ -291,7 +287,6 @@
             "properties": {
                 "enable_kronos": {
                     "type": "boolean",
-                    "default": false,
                     "description": "Skip KRONOS embedding extraction step.",
                     "fa_icon": "fas fa-stopwatch",
                     "help_text": "Set this to `true` to run KRONOS embedding extraction after cell measurement. Requires kronos_model_path and kronos_marker_metadata to be set."
@@ -377,7 +372,6 @@
             "properties": {
                 "smooth_masks": {
                     "type": "boolean",
-                    "default": false,
                     "description": "Enable mask smoothing before cell measurement.",
                     "fa_icon": "fas fa-wave-square",
                     "help_text": "When enabled, segmentation masks are smoothed to reduce polygon complexity before being passed to cellmeasurement. Choose the method with smooth_method."
@@ -549,7 +543,6 @@
             "properties": {
                 "generate_report": {
                     "type": "boolean",
-                    "default": true,
                     "description": "Generate segmentation report.",
                     "fa_icon": "fas fa-stopwatch",
                     "help_text": "Set this to `true` to generate a segmentation report. It is recommended that enable_measurements is set to `true` for the most comprehensive report. Skipping this step can save on processing time."
@@ -706,13 +699,13 @@
             "$ref": "#/$defs/kronos_options"
         },
         {
-            "$ref": "#/$defs/mask_smoothing_options"
-        },
-        {
             "$ref": "#/$defs/measurement_options"
         },
         {
             "$ref": "#/$defs/report_options"
+        },
+        {
+            "$ref": "#/$defs/mask_smoothing_options"
         },
         {
             "$ref": "#/$defs/institutional_config_options"
