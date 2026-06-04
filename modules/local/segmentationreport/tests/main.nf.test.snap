@@ -7,7 +7,7 @@
                         {
                             "id": "test"
                         },
-                        "test.html:md5,4734cdf87a83756f5b41ec4108686a02"
+                        "test.html:md5,ac50c02e538db7a41362f7f6de1fbbcc"
                     ]
                 ],
                 "1": [
@@ -24,7 +24,7 @@
                         {
                             "id": "test"
                         },
-                        "test.html:md5,4734cdf87a83756f5b41ec4108686a02"
+                        "test.html:md5,ac50c02e538db7a41362f7f6de1fbbcc"
                     ]
                 ],
                 "versions": [
@@ -36,7 +36,7 @@
             "nf-test": "0.9.2",
             "nextflow": "25.04.4"
         },
-        "timestamp": "2026-01-29T17:14:46.565151042"
+        "timestamp": "2026-06-04T13:42:41.168905093"
     },
     "segmentationreport - stub": {
         "content": [
