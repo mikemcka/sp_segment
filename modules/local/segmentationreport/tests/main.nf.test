@@ -18,6 +18,7 @@ nextflow_process {
                     file('${projectDir}/tests/data/mesmer/test_data_segmentation.geojson'),
                     true,
                     false,
+                    false,
                     'Nuclear',
                     'Membrane',
                     file('${projectDir}/tests/data/mesmer/test_data.tiff')
@@ -46,6 +47,7 @@ nextflow_process {
                     [ id:'stub_test' ], // meta map
                     file('${projectDir}/tests/data/mesmer/test_segmentation.geojson'),
                     true,
+                    false,
                     false,
                     'Nuclear',
                     'Membrane',

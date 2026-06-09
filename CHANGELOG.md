@@ -24,6 +24,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   values such as `--erosion-steps=4,7,11,14,18` (Groovy API) is not supported. Use the boolean
   flag `--erosion-steps` to enable the 5 equal-area bins.
 
+- pipeline can be run with whole-cell segmentation only (no nucleus segmentation)
+
 ### Added
 
 - **KRONOS embedding output**: new `kronosembeddings` module extracts per-cell embeddings using

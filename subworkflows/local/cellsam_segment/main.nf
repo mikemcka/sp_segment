@@ -205,7 +205,8 @@ workflow CELLSAM_SEGMENT {
                     sample,
                     annotations,
                     run_mesmer,
-                    (run_cellpose || run_cellsam),
+                    run_cellpose,
+                    run_cellsam,
                     nuclear_channel,
                     membrane_channels,
                     combined_tiff

@@ -195,6 +195,7 @@ workflow SOPA_SEGMENT {
                     annotations,
                     false, // run_mesmer
                     true,  // run_cellpose
+                    false, // run_cellsam
                     nuclear_channel,
                     membrane_channels,
                     combined_tiff

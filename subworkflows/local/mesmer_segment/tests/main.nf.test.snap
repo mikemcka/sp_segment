@@ -7,7 +7,7 @@
                         {
                             "id": "test"
                         },
-                        "test.geojson.gz:md5,9f2ca505a6599719ab7f707849de3742"
+                        "test.geojson.gz:md5,931972d5b167785634da07a9fae13a70"
                     ]
                 ],
                 "1": [
@@ -37,7 +37,7 @@
                 ],
                 "6": [
                     "versions.yml:md5,020f6b6c73631bfaf9a42689d3222190",
-                    "versions.yml:md5,05a93fa9c99683d08355f2e990779960",
+                    "versions.yml:md5,68a8830aa886f215d23c6be7ff709d11",
                     "versions.yml:md5,ec8fbc92050f538763cdc496a2986c88"
                 ],
                 "annotations": [
@@ -45,7 +45,7 @@
                         {
                             "id": "test"
                         },
-                        "test.geojson.gz:md5,9f2ca505a6599719ab7f707849de3742"
+                        "test.geojson.gz:md5,931972d5b167785634da07a9fae13a70"
                     ]
                 ],
                 "kronos_embeddings": [
@@ -67,7 +67,7 @@
                 ],
                 "versions": [
                     "versions.yml:md5,020f6b6c73631bfaf9a42689d3222190",
-                    "versions.yml:md5,05a93fa9c99683d08355f2e990779960",
+                    "versions.yml:md5,68a8830aa886f215d23c6be7ff709d11",
                     "versions.yml:md5,ec8fbc92050f538763cdc496a2986c88"
                 ],
                 "whole_cell_tif": [
@@ -84,6 +84,6 @@
             "nf-test": "0.9.2",
             "nextflow": "25.04.4"
         },
-        "timestamp": "2026-05-25T10:15:36.833053737"
+        "timestamp": "2026-06-09T15:43:13.149887483"
     }
 }

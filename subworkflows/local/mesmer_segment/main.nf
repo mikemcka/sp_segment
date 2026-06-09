@@ -201,7 +201,7 @@ workflow MESMER_SEGMENT {
                 _run_backsub,
                 run_mesmer,
                 run_cellpose,
-                _run_cellsam,
+                run_cellsam,
                 _tiff,
                 nuclear_channel,
                 membrane_channels,
@@ -211,6 +211,7 @@ workflow MESMER_SEGMENT {
                     annotations,
                     run_mesmer,
                     run_cellpose,
+                    run_cellsam,
                     nuclear_channel,
                     membrane_channels,
                     combined_tiff
