@@ -7,7 +7,7 @@
                         {
                             "id": "test"
                         },
-                        "test.geojson.gz:md5,da0063d5e066732ea2d753c5abd21814"
+                        "test.geojson.gz:md5,c5260d02474dde830a80f88e9df6021d"
                     ]
                 ],
                 "1": [
@@ -15,18 +15,18 @@
                         {
                             "id": "test"
                         },
-                        "test_mask.tiff:md5,4c6a2a631ae3ce0a8256d8f8abdeb54c"
+                        "test_mask.tiff:md5,beaadd91380839e1ecbdc9ac7e8bc305"
                     ]
                 ],
                 "2": [
-                    "versions.yml:md5,c21719ea9ad3f44a0d4b7e943338e587"
+                    "versions.yml:md5,77f39068248d01f6e07e70fc222393a1"
                 ],
                 "annotations": [
                     [
                         {
                             "id": "test"
                         },
-                        "test.geojson.gz:md5,da0063d5e066732ea2d753c5abd21814"
+                        "test.geojson.gz:md5,c5260d02474dde830a80f88e9df6021d"
                     ]
                 ],
                 "masks": [
@@ -34,11 +34,11 @@
                         {
                             "id": "test"
                         },
-                        "test_mask.tiff:md5,4c6a2a631ae3ce0a8256d8f8abdeb54c"
+                        "test_mask.tiff:md5,beaadd91380839e1ecbdc9ac7e8bc305"
                     ]
                 ],
                 "versions": [
-                    "versions.yml:md5,c21719ea9ad3f44a0d4b7e943338e587"
+                    "versions.yml:md5,77f39068248d01f6e07e70fc222393a1"
                 ]
             }
         ],
@@ -46,7 +46,7 @@
             "nf-test": "0.9.2",
             "nextflow": "25.04.4"
         },
-        "timestamp": "2026-05-22T21:21:46.549687055"
+        "timestamp": "2026-06-25T15:10:02.749749851"
     },
     "cellmeasurement - with cell expansion and skip measurements": {
         "content": [
@@ -101,7 +101,7 @@
                     ]
                 ],
                 "2": [
-                    "versions.yml:md5,c21719ea9ad3f44a0d4b7e943338e587"
+                    "versions.yml:md5,77f39068248d01f6e07e70fc222393a1"
                 ],
                 "annotations": [
                     [
@@ -120,7 +120,7 @@
                     ]
                 ],
                 "versions": [
-                    "versions.yml:md5,c21719ea9ad3f44a0d4b7e943338e587"
+                    "versions.yml:md5,77f39068248d01f6e07e70fc222393a1"
                 ]
             }
         ],
@@ -128,7 +128,7 @@
             "nf-test": "0.9.2",
             "nextflow": "25.04.4"
         },
-        "timestamp": "2026-05-22T21:22:25.822190464"
+        "timestamp": "2026-06-25T15:10:52.287012358"
     },
     "cellmeasurement - skip measurements": {
         "content": [
