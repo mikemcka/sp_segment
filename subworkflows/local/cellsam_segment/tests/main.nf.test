@@ -37,4 +37,31 @@ nextflow_workflow {
             )
         }
     }
+
+    test("cellsam_segment - multi-membrane combine") {
+
+        when {
+            workflow {
+                """
+                input[0] = Channel.of([
+                    [ id: 'test_multimem' ],
+                    false,  // run_backsub
+                    false,  // run_mesmer
+                    false,  // run_cellpose
+                    true,   // run_cellsam
+                    file("${projectDir}/tests/data/comet/synthetic_multichannel.tif", checkIfExists: true), // tiff
+                    "DAPI",       // nuclear_channel
+                    "CD45:TRITC"  // two membrane markers -> combined upstream of cellSAM
+                ])
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert workflow.success},
+                { assert snapshot(workflow.out).match()}
+            )
+        }
+    }
 }

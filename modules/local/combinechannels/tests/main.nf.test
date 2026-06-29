@@ -82,4 +82,28 @@ nextflow_process {
 
     }
 
+    test("combinechannels - multi-membrane combine") {
+
+        when {
+            process {
+                """
+                input[0] = [
+                    [ id:'test' ], // meta map
+                    file('${projectDir}/tests/data/comet/synthetic_multichannel.tif'), // tiff
+                    "DAPI", // nuclear_channel
+                    "CD45:TRITC" // two membrane markers -> combined into 'combined_membrane'
+                ]
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert process.success },
+                { assert snapshot(process.out).match() }
+            )
+        }
+
+    }
+
 }

@@ -387,6 +387,16 @@ def main(
     else:
         final_channels = [nuclear_channel, membrane_channel[0]]
 
+    # Report what was combined so it stays visible in the process log
+    # (downstream segmenters only see the single combined membrane channel).
+    typer.echo(
+        f"[combine_channels] nuclear='{nuclear_channel}'; "
+        f"membrane={membrane_channel} -> '{final_channels[1]}' "
+        f"(method={CombineMethod(combine_method).value}, "
+        f"n={len(membrane_channel)})",
+        err=True,
+    )
+
     # Extract final channels and convert to output format
     output_array = full_array.sel(C=final_channels).values.astype(np.uint16)
 
