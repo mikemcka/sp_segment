@@ -131,6 +131,39 @@
         },
         "timestamp": "2026-04-14T16:00:48.093136127"
     },
+    "combinechannels - multi-membrane combine": {
+        "content": [
+            {
+                "0": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "test_combined_channels.tiff:md5,69155ed4fd6e566ba83d224ae9192ddc"
+                    ]
+                ],
+                "1": [
+                    "versions.yml:md5,338938a53c7b3f9fb82462bfe80ec358"
+                ],
+                "combined_tiff": [
+                    [
+                        {
+                            "id": "test"
+                        },
+                        "test_combined_channels.tiff:md5,69155ed4fd6e566ba83d224ae9192ddc"
+                    ]
+                ],
+                "versions": [
+                    "versions.yml:md5,338938a53c7b3f9fb82462bfe80ec358"
+                ]
+            }
+        ],
+        "meta": {
+            "nf-test": "0.9.2",
+            "nextflow": "25.04.4"
+        },
+        "timestamp": "2026-07-13T14:11:53.382725877"
+    },
     "combinechannels - non-OME tiff": {
         "content": [
             {

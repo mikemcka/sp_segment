@@ -34,10 +34,31 @@ workflow CELLSAM_SEGMENT {
 
 
     //
+    // Combine membrane channels into a single channel before segmentation.
+    // Mirrors the SOPA/Cellpose path so cellSAM uses all listed membrane
+    // markers instead of only the first match.
+    //
+    COMBINECHANNELS(
+        ch_cellsam
+    )
+    ch_versions = ch_versions.mix(COMBINECHANNELS.out.versions.first())
+
+    // Replace tiff with combined_tiff
+    // If there are multiple membrane channels, rename to 'combined_membrane'
+    COMBINECHANNELS.out.combined_tiff
+        .join( ch_cellsam, by: 0 )
+        .map { meta, combined_tiff, _tiff, nuclear_channel, membrane_channels ->
+            def membrane_name = membrane_channels.split(':').size() == 1 ?
+                membrane_channels : 'combined_membrane'
+            [ meta, combined_tiff, nuclear_channel, membrane_name ]
+        }.set { ch_combined }
+
+
+    //
     // Run CELLSAMSEGMENT module for whole-cell segmentation
     //
     CELLSAMWC(
-        ch_cellsam,
+        ch_combined,
         "whole-cell"
     )
     ch_versions = ch_versions.mix(CELLSAMWC.out.versions.first())
@@ -48,7 +69,7 @@ workflow CELLSAM_SEGMENT {
     //
     if (!params.use_whole_cell_only) {
         CELLSAMNUC(
-            ch_cellsam,
+            ch_combined,
             "nuclear"
         )
         ch_versions = ch_versions.mix(CELLSAMNUC.out.versions.first())
@@ -181,13 +202,9 @@ workflow CELLSAM_SEGMENT {
     if (params.generate_report) {
 
         //
-        // Combine channels for report background image
+        // Reuse the combined channels tiff (produced above) as the report
+        // background image
         //
-        COMBINECHANNELS(
-            ch_cellsam
-        )
-        ch_versions = ch_versions.mix(COMBINECHANNELS.out.versions.first())
-
         ch_cellsam_segment
             .join(ch_annotations)
             .join(COMBINECHANNELS.out.combined_tiff, by: 0)
