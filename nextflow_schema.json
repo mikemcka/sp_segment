@@ -422,7 +422,7 @@
                 },
                 "neighbors": {
                     "type": "integer",
-                    "default": 5,
+                    "default": 0,
                     "minimum": 0,
                     "description": "Number of nearest neighbors for neighborhood feature aggregation (0 = disabled).",
                     "fa_icon": "fas fa-project-diagram",
