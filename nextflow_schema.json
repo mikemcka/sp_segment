@@ -465,6 +465,21 @@
                     "fa_icon": "fas fa-compress-arrows-alt",
                     "minimum": 0,
                     "help_text": "The overlap between tiles. This should be set to at least the size of the largest cell in the image to ensure that measurements from cells are complete."
+                },
+                "geometry_checkpoint_dir": {
+                    "type": "string",
+                    "format": "directory-path",
+                    "description": "Directory for resumable polygon-extraction checkpoints.",
+                    "fa_icon": "fas fa-save",
+                    "help_text": "Polygon extraction writes each completed batch of cells to this directory, so a CELLMEASUREMENT task killed by wall-time or OOM resumes from the last completed batch instead of restarting. Must point OUTSIDE the Nextflow work directory: a retry runs in a fresh work directory, so a checkpoint written there would be discarded. Leave unset to disable checkpointing."
+                },
+                "geometry_batch_size": {
+                    "type": "integer",
+                    "default": 2000,
+                    "description": "Cells per polygon-extraction batch, and the checkpoint granularity.",
+                    "fa_icon": "fas fa-layer-group",
+                    "minimum": 1,
+                    "help_text": "Smaller batches checkpoint more often but add per-batch overhead. At most one batch of work per worker is lost when a job is killed."
                 }
             }
         },

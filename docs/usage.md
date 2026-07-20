@@ -256,6 +256,26 @@ Channel names are matched case-insensitively to KRONOS marker metadata. Use
 | expansion_steps             | Measure intensity in 5 equal-area expansion bins within 20 µm outward from the cell boundary (default: `true`).                |
 | environment_expansion       | Measure a pericellular 20 µm environment zone around each cell (default: `true`).                                              |
 | gzip_geojson                | Gzip-compress the output GeoJSON (produces `.geojson.gz`). Recommended for large whole-slide images (default: `true`).         |
+| geometry_checkpoint_dir     | Directory for resumable polygon-extraction checkpoints. Unset = disabled. See below.                                          |
+| geometry_batch_size         | Cells per polygon-extraction batch, and the checkpoint granularity (default: `2000`).                                         |
+
+#### Resuming polygon extraction after a killed job
+
+On whole-slide images with millions of cells, polygon extraction is the longest
+phase of `CELLMEASUREMENT`. Setting `geometry_checkpoint_dir` makes it write each
+completed batch of cells to disk, so a task killed by wall-time or OOM resumes
+from the last completed batch rather than starting over:
+
+```bash
+nextflow run . -profile medium --geometry_checkpoint_dir /vast/scratch/$USER/sp_segment_checkpoints
+```
+
+The directory **must be outside the Nextflow work directory**. A retry runs in a
+freshly allocated work directory, so a checkpoint written there is discarded and
+the retry restarts from zero. Checkpoints are namespaced per sample and per mask,
+and are ignored if the run's settings (tolerance, batch size, mask dimensions,
+cell count) differ from the ones that produced them. They are not deleted
+automatically — remove the directory once a run has completed successfully.
 
 ### Report parameters
 
