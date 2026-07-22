@@ -256,11 +256,21 @@ are documented in [docs/output.md](docs/output.md#cellsam-segmentation).
 
 ## Dealing with large images
 
-You can run the pipeline with different profiles for different size images:
+The pipeline ships SLURM profiles sized for different workloads. The default
+profiles use conservative memory requests:
 
 - `small`: for images <150GB
 - `medium`: for images <300GB
 - `large`: for images <600GB
+
+Segmentation load is driven more by cell count than by raw image size. For very
+dense samples (millions of cells, e.g. large tumour regions) the conservative
+requests may not be enough. WEHI users on Milton can instead use the
+node-matched heavy-compute profiles, which size each task to a target node:
+
+- `wehi_small`: sml nodes (28 cores, 113GB)
+- `wehi_med`: med/il nodes (28/48 cores, 491GB)
+- `wehi_large`: lrg nodes (64 cores, 1498GB)
 
 > [!WARNING]
 > If you are combining many membrane channels, using `prod` as the combine method
