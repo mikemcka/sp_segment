@@ -256,8 +256,8 @@ Channel names are matched case-insensitively to KRONOS marker metadata. Use
 | expansion_steps             | Measure intensity in 5 equal-area expansion bins within 20 µm outward from the cell boundary (default: `true`).                |
 | environment_expansion       | Measure a pericellular 20 µm environment zone around each cell (default: `true`).                                              |
 | gzip_geojson                | Gzip-compress the output GeoJSON (produces `.geojson.gz`). Recommended for large whole-slide images (default: `true`).         |
-| geometry_checkpoint_dir     | Directory for resumable polygon-extraction checkpoints. Unset = disabled. See below.                                          |
-| geometry_batch_size         | Cells per polygon-extraction batch, and the checkpoint granularity (default: `2000`).                                         |
+| geometry_checkpoint_dir     | Directory for resumable polygon-extraction checkpoints. Unset = disabled. See below.                                           |
+| geometry_batch_size         | Cells per polygon-extraction batch, and the checkpoint granularity (default: `2000`).                                          |
 
 #### Resuming polygon extraction after a killed job
 
