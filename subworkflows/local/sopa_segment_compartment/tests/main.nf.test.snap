@@ -148,7 +148,7 @@
                         {
                             "id": "test"
                         },
-                        "test_whole-cell.tiff:md5,c337b44dae3f99010ee7a9b790a8c03c"
+                        "test_whole-cell.tiff:md5,bd43c8764d1c3769fa517d8c3dc37a25"
                     ]
                 ],
                 "2": [
@@ -163,7 +163,7 @@
                         {
                             "id": "test"
                         },
-                        "test_whole-cell.tiff:md5,c337b44dae3f99010ee7a9b790a8c03c"
+                        "test_whole-cell.tiff:md5,bd43c8764d1c3769fa517d8c3dc37a25"
                     ]
                 ],
                 "versions": [
@@ -316,7 +316,7 @@
                 ]
             }
         ],
-        "timestamp": "2026-10-14T15:17:31.825923539",
+        "timestamp": "2026-11-01T10:42:22.355573842",
         "meta": {
             "nf-test": "0.9.5",
             "nextflow": "25.10.0"
@@ -471,7 +471,7 @@
                         {
                             "id": "test"
                         },
-                        "test_nuclear.tiff:md5,31887e5f7309f0b041aaf6bbb225cff5"
+                        "test_nuclear.tiff:md5,d67f5dc38d0bc805b854150b74f61b97"
                     ]
                 ],
                 "2": [
@@ -486,7 +486,7 @@
                         {
                             "id": "test"
                         },
-                        "test_nuclear.tiff:md5,31887e5f7309f0b041aaf6bbb225cff5"
+                        "test_nuclear.tiff:md5,d67f5dc38d0bc805b854150b74f61b97"
                     ]
                 ],
                 "versions": [
@@ -639,7 +639,7 @@
                 ]
             }
         ],
-        "timestamp": "2026-10-14T15:22:43.981414333",
+        "timestamp": "2026-11-01T10:47:35.975826392",
         "meta": {
             "nf-test": "0.9.5",
             "nextflow": "25.10.0"
