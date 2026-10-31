@@ -21,6 +21,10 @@ process SOPA_PATCHIFYIMAGE {
     script:
     def args = task.ext.args ?: ''
     """
+    # The apptainer profile runs with --no-home, so numba (imported by sopa) has no
+    # writable cache directory and fails with "no locator available".
+    export NUMBA_CACHE_DIR=\$PWD/.numba_cache
+
     sopa patchify image \\
         ${args} \\
         ${zarr} \\

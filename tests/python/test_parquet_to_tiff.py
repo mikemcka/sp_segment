@@ -1,4 +1,4 @@
-"""Unit tests for label-dtype selection in ``bin/parquet_to_tiff.py``.
+"""Unit tests for ``bin/parquet_to_tiff.py``: label dtype and pixel convention.
 
 Label IDs are stored as pixel values, so a mask dtype too narrow for the largest
 ID silently truncates the segmentation. This is worth pinning because there is
@@ -19,6 +19,7 @@ from parquet_to_tiff import (
     LABEL_DTYPE,
     MASK_COMPRESSION,
     MASK_COMPRESSION_ARGS,
+    rasterize_labels,
 )
 
 UINT16_MAX = np.iinfo(np.uint16).max  # 65535
@@ -88,3 +89,68 @@ def test_mask_compression_is_lossless_and_smaller(tmp_path):
 
     assert path.stat().st_size < mask.nbytes
     assert np.array_equal(tifffile.imread(path), mask)
+
+
+# ----------------------------------------------------------------------------
+# pixel convention: geometries from sopa back to the same pixels
+# ----------------------------------------------------------------------------
+#
+# sopa vectorises a label image with pixel (row r, column c) centred on the
+# point (x=c, y=r). These tests build cell outlines the same way (the union of
+# the unit squares around each pixel centre) and check that rasterising them
+# gives back exactly the label image they came from.
+
+
+def _outlines_from_labels(labels):
+    """One polygon per label: the union of its pixels' squares, centred on (c, r)."""
+    from shapely.ops import unary_union
+
+    shapes = []
+    for value in np.unique(labels[labels > 0]):
+        rows, cols = np.nonzero(labels == value)
+        squares = [box(c - 0.5, r - 0.5, c + 0.5, r + 0.5) for r, c in zip(rows, cols)]
+        shapes.append((unary_union(squares), int(value)))
+    return shapes
+
+
+def _example_labels():
+    """Three cells in a 12 x 16 image, two of them separated by a 1-pixel gap."""
+    labels = np.zeros((12, 16), dtype=np.uint32)
+    labels[0:4, 0:3] = 1     # touches the top-left corner
+    labels[5:10, 4:8] = 2
+    labels[5:10, 9:13] = 3   # column 8 is the 1-pixel gap between cells 2 and 3
+    labels[6, 13] = 3        # a one-pixel bump
+    return labels
+
+
+def test_rasterize_labels_reproduces_the_label_image():
+    labels = _example_labels()
+    height, width = labels.shape
+
+    mask = rasterize_labels(_outlines_from_labels(labels), width, height)
+
+    assert mask.dtype == LABEL_DTYPE
+    assert np.array_equal(mask, labels)
+
+
+def test_rasterize_labels_keeps_the_gap_between_neighbouring_cells():
+    """all_touched=True filled the gap column, so neighbouring cells touched."""
+    labels = _example_labels()
+    height, width = labels.shape
+
+    mask = rasterize_labels(_outlines_from_labels(labels), width, height)
+
+    assert not mask[5:10, 8].any()
+
+
+def test_rasterize_labels_keeps_image_orientation():
+    """Row 0 of the output is y = 0 (the top of the image); no flip is needed."""
+    labels = np.zeros((10, 10), dtype=np.uint32)
+    labels[0, 0] = 1
+    labels[9, 3] = 2
+
+    mask = rasterize_labels(_outlines_from_labels(labels), 10, 10)
+
+    assert mask[0, 0] == 1
+    assert mask[9, 3] == 2
+    assert np.count_nonzero(mask) == 2

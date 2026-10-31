@@ -20,6 +20,10 @@ process SOPA_RESOLVECELLPOSE {
 
     script:
     """
+    # The apptainer profile runs with --no-home, so numba (imported by sopa) has no
+    # writable cache directory and fails with "no locator available".
+    export NUMBA_CACHE_DIR=\$PWD/.numba_cache
+
     sopa resolve cellpose ${zarr}
 
     cat <<-END_VERSIONS > versions.yml

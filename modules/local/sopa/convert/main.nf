@@ -22,6 +22,10 @@ process SOPA_CONVERT {
     script:
     def args = task.ext.args ?: ''
     """
+    # The apptainer profile runs with --no-home, so numba (imported by sopa) has no
+    # writable cache directory and fails with "no locator available".
+    export NUMBA_CACHE_DIR=\$PWD/.numba_cache
+
     sopa convert \\
         ${args} \\
         --sdata-path ${meta.id}_${compartment}.zarr \\

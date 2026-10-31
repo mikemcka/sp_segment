@@ -16,8 +16,8 @@ from pathlib import Path
 import typer
 import numpy as np
 import pyarrow.parquet as pq
-import rasterio
 from rasterio.features import rasterize
+from rasterio.transform import Affine
 from tifffile import TiffFile, imwrite
 from shapely import wkb
 from typing import Annotated
@@ -50,6 +50,32 @@ def get_image_dimensions(tiff_path: Path) -> tuple[int, int]:
     size_y = int(pixel_data.attrib['SizeY'])
 
     return size_x, size_y
+
+
+# sopa vectorises a label image with pixel (row r, column c) centred on the
+# point (x=c, y=r), so pixel r covers r - 0.5 to r + 0.5. This transform maps
+# raster pixel (r, c) back to that same square: x = c - 0.5, y = r - 0.5 at its
+# top-left corner, with y increasing down the rows (image orientation).
+PIXEL_CENTRE_TRANSFORM = Affine(1.0, 0.0, -0.5, 0.0, 1.0, -0.5)
+
+
+def rasterize_labels(shapes, size_x: int, size_y: int) -> np.ndarray:
+    """
+    Burns (geometry, label) pairs into a (size_y, size_x) label image.
+
+    A pixel gets a label when its centre lies inside the geometry. With
+    ``all_touched=True`` every pixel the outline passes through would be
+    filled instead, which grows each cell by about half a pixel and makes
+    neighbouring cells touch.
+    """
+    return rasterize(
+        shapes=shapes,
+        out_shape=(size_y, size_x),  # rasterio uses (height, width)
+        fill=0,
+        transform=PIXEL_CENTRE_TRANSFORM,
+        dtype=LABEL_DTYPE,
+        all_touched=False,
+    )
 
 
 def main(
@@ -90,23 +116,8 @@ def main(
     # Get X and Y dimensions from the TIFF file
     (size_x, size_y) = get_image_dimensions(tiff_path)
 
-    # Rasterize: (geometry, value)
-    shapes = ((geom, fid) for geom, fid in zip(geometries, ids))
-    bounds = (
-        0, 0, size_x, size_y
-    )
-    mask = rasterize(
-        shapes=shapes,
-        out_shape=(size_y, size_x),  # Note: rasterio uses (height, width)
-        fill=0,
-        transform=rasterio.transform.from_bounds(
-            *bounds,
-            width=size_x,
-            height=size_y
-        ),
-        dtype=LABEL_DTYPE,
-        all_touched=True  # Fill shapes
-    )
+    shapes = zip(geometries, ids)
+    mask = rasterize_labels(shapes, size_x, size_y)
 
     # stdout carries the TIFF, so diagnostics go to stderr.
     max_label = int(mask.max())
@@ -119,7 +130,7 @@ def main(
     # Write TIFF output
     imwrite(
         sys.stdout.buffer,
-        np.flipud(mask),
+        mask,
         compression=MASK_COMPRESSION,
         compressionargs=MASK_COMPRESSION_ARGS,
     )
